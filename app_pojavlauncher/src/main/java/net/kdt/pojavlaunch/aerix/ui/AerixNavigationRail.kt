@@ -229,6 +229,7 @@ fun AerixNavigationRail(
 /**
  * Floating bottom dock with the same destinations as [AerixNavigationRail]. The selected entry
  * keeps the accent pill, glow and ring of the rail items, so the page keeps the full width.
+ * It scrolls sideways when the entries do not fit the screen.
  */
 @Composable
 fun AerixBottomDock(

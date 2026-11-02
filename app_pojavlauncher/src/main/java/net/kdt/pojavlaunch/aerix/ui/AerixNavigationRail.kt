@@ -35,10 +35,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -217,6 +219,77 @@ fun AerixNavigationRail(
                     selected = selectedSection == LauncherSection.ACCOUNTS || selectedSection == LauncherSection.ADD_ACCOUNT || selectedSection == LauncherSection.OFFLINE_ACCOUNT,
                     expanded = expandedRail,
                     compact = compactRail,
+                    onClick = { onNavigate(LauncherSection.ACCOUNTS) }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Floating bottom dock with the same destinations as [AerixNavigationRail]. The selected entry
+ * keeps the accent pill, glow and ring of the rail items, so the page keeps the full width.
+ */
+@Composable
+fun AerixBottomDock(
+    selectedSection: LauncherSection,
+    onNavigate: (LauncherSection) -> Unit,
+    onCreateInstance: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val account = PojavAccountBridge.current
+    val scrollState = rememberScrollState()
+    val activeAccent = AerixThemeManager.currentAccent()
+    val compactDock = LocalConfiguration.current.screenHeightDp < AERIX_COMPACT_HEIGHT_THRESHOLD_DP
+    val dockShape = RoundedCornerShape(26.dp)
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = AerixSpacing.lg, end = AerixSpacing.lg, top = AerixSpacing.xs, bottom = AerixSpacing.xs),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            modifier = Modifier.liquidGlass(shape = dockShape, tint = AerixSurface.glassTint, strength = 0.94f, elevation = AerixMetrics.glassRailElevation),
+            shape = dockShape,
+            color = Color.Transparent,
+            contentColor = Color.White
+        ) {
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(scrollState)
+                    .padding(horizontal = AerixSpacing.sm, vertical = AerixSpacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(if (compactDock) AerixSpacing.xs else AerixSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RailIconItem(R.drawable.aerix_ic_home_filled, stringResource(R.string.aerix_nav_home),
+                    selectedSection == LauncherSection.HOME, activeAccent, false, compactDock) { onNavigate(LauncherSection.HOME) }
+                RailIconItem(R.drawable.aerix_ic_client_crystal, "Aerix Client",
+                    selectedSection == LauncherSection.AERIX_CLIENT, activeAccent, false, compactDock) { onNavigate(LauncherSection.AERIX_CLIENT) }
+                RailIconItem(R.drawable.aerix_ic_add, stringResource(R.string.create_instance),
+                    selectedSection == LauncherSection.CREATE_INSTANCE, activeAccent, false, compactDock,
+                    onClick = onCreateInstance, guideKey = AerixGuideState.CREATE)
+                RailIconItem(R.drawable.aerix_ic_dashboard_filled, stringResource(R.string.aerix_nav_library),
+                    librarySelected(selectedSection), activeAccent, false, compactDock,
+                    onClick = { onNavigate(LauncherSection.LIBRARY) }, guideKey = AerixGuideState.LIBRARY)
+                RailIconItem(R.drawable.aerix_ic_public, stringResource(R.string.aerix_nav_discover),
+                    discoverSelected(selectedSection), activeAccent, false, compactDock) { onNavigate(LauncherSection.DISCOVER) }
+                RailIconItem(R.drawable.aerix_ic_rocket_launch_filled, "Our other new releases",
+                    selectedSection == LauncherSection.OTHER_RELEASES, activeAccent, false, compactDock) { onNavigate(LauncherSection.OTHER_RELEASES) }
+                RailIconItem(R.drawable.aerix_ic_format_paint_outlined, stringResource(R.string.aerix_nav_wallpapers),
+                    wallpapersSelected(selectedSection), activeAccent, false, compactDock,
+                    onClick = { onNavigate(LauncherSection.WALLPAPERS) }, guideKey = AerixGuideState.WALLPAPERS)
+                RailIconItem(R.drawable.aerix_ic_settings_filled, stringResource(R.string.aerix_nav_settings),
+                    settingsSelected(selectedSection), activeAccent, false, compactDock,
+                    onClick = { onNavigate(LauncherSection.SETTINGS) }, guideKey = AerixGuideState.SETTINGS)
+                RailIconItem(R.drawable.aerix_ic_group_outlined, stringResource(R.string.aerix_nav_contribution),
+                    selectedSection == LauncherSection.CONTRIBUTION || selectedSection == LauncherSection.CONTRIBUTION_DETAIL,
+                    activeAccent, false, compactDock) { onNavigate(LauncherSection.CONTRIBUTION) }
+                AccountAvatarRailButton(
+                    account = account,
+                    selected = selectedSection == LauncherSection.ACCOUNTS || selectedSection == LauncherSection.ADD_ACCOUNT || selectedSection == LauncherSection.OFFLINE_ACCOUNT,
+                    expanded = false,
+                    compact = compactDock,
                     onClick = { onNavigate(LauncherSection.ACCOUNTS) }
                 )
             }

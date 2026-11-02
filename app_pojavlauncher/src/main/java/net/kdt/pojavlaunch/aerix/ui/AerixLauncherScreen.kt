@@ -39,6 +39,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -166,20 +167,11 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
         // The wallpaper and the festival effects run to the edges of the display; the shell
         // itself stays clear of the camera cutout and of the system bars.
         Box(modifier = Modifier.fillMaxSize().padding(AerixWindowInsets.padding())) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                // The social space has its own sidebar and takes the whole window; every other
-                // section keeps the launcher's rail.
-                if (section != LauncherSection.SOCIALS) {
-                    AerixNavigationRail(
-                        selectedSection = section,
-                        onNavigate = navigate,
-                        onCreateInstance = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) }
-                    )
-                }
+            Column(modifier = Modifier.fillMaxSize()) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight()
+                        .fillMaxWidth()
                 ) {
                     AnimatedContent(
                         targetState = section,
@@ -248,6 +240,16 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
                             trackColor = Color.Transparent
                         )
                     }
+                }
+
+                // The social space has its own sidebar and takes the whole window; every other
+                // section gets the launcher's bottom dock.
+                if (section != LauncherSection.SOCIALS) {
+                    AerixBottomDock(
+                        selectedSection = section,
+                        onNavigate = navigate,
+                        onCreateInstance = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) }
+                    )
                 }
             }
 

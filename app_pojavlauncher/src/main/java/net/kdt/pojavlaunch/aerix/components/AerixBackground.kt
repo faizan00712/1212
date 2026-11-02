@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -48,6 +49,9 @@ import net.kdt.pojavlaunch.aerix.bridge.AerixPreferences
 import net.kdt.pojavlaunch.aerix.theme.AerixSurface
 import net.kdt.pojavlaunch.aerix.theme.AerixThemeManager
 import net.kdt.pojavlaunch.aerix.theme.ThemeMotion
+
+private val DarkBackgroundTop = Color(0xFF04070A)
+private val DarkBackgroundBottom = Color(0xFF0A0F14)
 
 private var wallpaperCacheKey: String? = null
 private var wallpaperCacheBitmap: ImageBitmap? = null
@@ -106,7 +110,7 @@ fun AerixBackground(modifier: Modifier = Modifier, content: @Composable BoxScope
     // One switch for the whole launcher: the accent motion and everything on this page obey it.
     val motion = ThemeMotion.rememberEnabled()
     val animation = animationById(id)
-    Box(modifier.fillMaxSize().background(AerixSurface.canvas)) {
+    Box(modifier.fillMaxSize().background(if (id == AerixThemeManager.WALLPAPER_NONE) DarkBackgroundTop else AerixSurface.canvas)) {
         // Footage that ships with the launcher: played straight from the APK, no bitmap involved.
         if (AerixThemeManager.isBundledClipId(id)) {
             val clip = bundledClipById(id.removePrefix(AerixThemeManager.WALLPAPER_CLIP_ASSET_PREFIX))
@@ -156,7 +160,13 @@ fun AerixBackground(modifier: Modifier = Modifier, content: @Composable BoxScope
             Box(
                 Modifier
                     .fillMaxSize()
-                    .background(Brush.verticalGradient(listOf(AerixSurface.canvas, AerixSurface.panelRaised)))
+                    .background(
+                        if (id == AerixThemeManager.WALLPAPER_NONE) {
+                            Brush.verticalGradient(listOf(DarkBackgroundTop, DarkBackgroundBottom))
+                        } else {
+                            Brush.verticalGradient(listOf(AerixSurface.canvas, AerixSurface.panelRaised))
+                        }
+                    )
             )
         }
         content()

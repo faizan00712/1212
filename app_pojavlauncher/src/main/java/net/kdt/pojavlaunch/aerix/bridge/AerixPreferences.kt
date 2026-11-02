@@ -79,10 +79,11 @@ object AerixPreferences {
     /** Attach modpack art, clickable info URLs, and action buttons to Discord Rich Presence cards. */
     const val KEY_DISCORD_CLICKABLE_LINKS = "aerixDiscordClickableLinks"
 
-    const val DEFAULT_CUSTOM_COLOR = 0xFF8DEFE0.toInt()
+    const val DEFAULT_CUSTOM_COLOR = 0xFF8B5CF6.toInt()
     const val DEFAULT_BACKGROUND_OPACITY = 60
     const val DEFAULT_ANIMATE_SPEED = 3
-    const val DEFAULT_WALLPAPER = "wp_01_lush_caves"
+    const val DEFAULT_WALLPAPER = "none"
+    private const val KEY_DARK_BACKGROUND_MIGRATED = "aerixDarkBackgroundMigrated"
     /** Mirai AllSettings.logBufferFlushInterval default. */
     const val DEFAULT_LOG_BUFFER_FLUSH_INTERVAL = 200
 
@@ -189,6 +190,14 @@ object AerixPreferences {
         fullScreen = p.getBoolean(KEY_FULL_SCREEN, true)
         animateSpeed = p.getInt(KEY_ANIMATE_SPEED, DEFAULT_ANIMATE_SPEED).coerceIn(0, 10)
         selectedWallpaper = p.getString(KEY_SELECTED_WALLPAPER, DEFAULT_WALLPAPER) ?: DEFAULT_WALLPAPER
+        if (!p.getBoolean(KEY_DARK_BACKGROUND_MIGRATED, false)) {
+            // One-time switch from the bundled photo wallpapers to the plain dark background.
+            if (selectedWallpaper.startsWith("wp_")) {
+                selectedWallpaper = DEFAULT_WALLPAPER
+                p.edit().putString(KEY_SELECTED_WALLPAPER, DEFAULT_WALLPAPER).apply()
+            }
+            p.edit().putBoolean(KEY_DARK_BACKGROUND_MIGRATED, true).apply()
+        }
         lastSection = p.getString(KEY_LAST_SECTION, "HOME") ?: "HOME"
         backgroundBlur = p.getInt(KEY_BACKGROUND_BLUR, 0).coerceIn(0, 20)
         swapAnimateType = runCatching {

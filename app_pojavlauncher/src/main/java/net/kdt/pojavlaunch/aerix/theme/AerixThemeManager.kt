@@ -169,7 +169,7 @@ object AerixThemeManager {
         val wasActive = AerixPreferences.selectedWallpaper == clipId(file)
         file.delete()
         if (wasActive) {
-            AerixPreferences.saveSelectedWallpaper(wallpapers.first().id)
+            AerixPreferences.saveSelectedWallpaper(WALLPAPER_NONE)
             wallpaperRevision++
         }
     }

@@ -29,24 +29,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 object AerixSurface {
-    val canvas = Color(0xFF07131D)
-    val panel = Color(0x4F172B3A)
-    val panelRaised = Color(0x5C223B4E)
-    val panelTrack = Color(0x40344F63)
-    val panelGlassTint = Color(0x3D22445A)
-    val border = Color(0x78E6FAFF)
-    val borderSoft = Color(0x48E6FAFF)
-    val borderHighlight = Color(0xE0E6FCFF)
-    val glassTint = Color(0xFF2B5063)
-    val glassBlue = Color(0xFF91E9FF)
-    val glassViolet = Color(0xFFB7A9FF)
-    val glassRose = Color(0xFFF3A9D9)
-    val auroraCyan = Color(0xFF37DCEC)
-    val auroraViolet = Color(0xFF7A71F5)
+    val canvas = Color(0xFF06050A)
+    val panel = Color(0x4F1C1830)
+    val panelRaised = Color(0x5C2A2342)
+    val panelTrack = Color(0x40372E58)
+    val panelGlassTint = Color(0x3D2D2350)
+    val border = Color(0x5CF1ECFF)
+    val borderSoft = Color(0x2EF1ECFF)
+    val borderHighlight = Color(0xB3F5F2FF)
+    val glassTint = Color(0xFF2B2145)
+    val glassBlue = Color(0xFFC4B5FD)
+    val glassViolet = Color(0xFF8B5CF6)
+    val glassRose = Color(0xFFF43F5E)
+    val auroraCyan = Color(0xFFA78BFA)
+    val auroraViolet = Color(0xFFF43F5E)
     val glassShadow = Color(0x66000610)
 
     /** Static fallback used to define the built-in Aerix palette and wallpaper presets. */
-    val accentDefault = Color(0xFF8DEFE0)
+    val accentDefault = Color(0xFF8B5CF6)
 
     /** Current launcher accent; UI controls use this instead of a baked-in color. */
     val accent: Color
@@ -55,16 +55,16 @@ object AerixSurface {
         @Composable get() = accent
     val onAction: Color
         @Composable get() = onAccent
-    val accentSecondary = Color(0xFFC1B5FF)
-    val accentGlow = Color(0x668DEFE0)
-    val accentContainerDefault = Color(0x5539C8C1)
+    val accentSecondary = Color(0xFFF43F5E)
+    val accentGlow = Color(0x668B5CF6)
+    val accentContainerDefault = Color(0x558B5CF6)
     val accentContainer: Color
         @Composable get() = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.33f)
-    val onAccentDefault = Color(0xFF06201D)
+    val onAccentDefault = Color(0xFFFFFFFF)
     val onAccent: Color
         @Composable get() = MaterialTheme.colorScheme.onPrimary
-    val onAccentContainer = Color(0xFFBDFAF3)
-    val accentLight = Color(0xFF006D73)
+    val onAccentContainer = Color(0xFFEDE9FE)
+    val accentLight = Color(0xFF6D28D9)
     val lightPanel = Color(0xFFFCFEFF)
     val lightTextPrimary = Color(0xFF14212B)
     val errorDarkContainer = Color(0xFF7A2635)
@@ -75,8 +75,8 @@ object AerixSurface {
     val shadowSoft = Color(0x3A000000)
     val scrimSoft = Color(0x33000000)
     val textPrimary = Color(0xFFF1F6FA)
-    val textSecondary = Color(0xFFA8B9C5)
-    val textMuted = Color(0xFF7D909D)
+    val textSecondary = Color(0xFFB0A8C4)
+    val textMuted = Color(0xFF9A93B0)
     val success = Color(0xFF73E5B0)
     val warning = Color(0xFFFFC777)
     val danger = Color(0xFFFF7189)

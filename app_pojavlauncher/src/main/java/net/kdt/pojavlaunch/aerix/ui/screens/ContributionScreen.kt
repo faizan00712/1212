@@ -142,7 +142,7 @@ object AerixContribution {
 fun ContributionScreen(onOpen: (ContributionMember) -> Unit) {
     AerixPage(
         title = "Contribution",
-        subtitle = "The people who build and run Aerix Launcher"
+        subtitle = "The people who build and run Lucifer Launcher"
     ) {
         Column(
             modifier = Modifier
@@ -352,7 +352,7 @@ fun ContributionDetailScreen(member: ContributionMember, onBack: () -> Unit) {
                     fontWeight = FontWeight.Black
                 )
                 Text(
-                    text = "What they do in Aerix Launcher",
+                    text = "What they do in Lucifer Launcher",
                     color = AerixSurface.textSecondary,
                     fontSize = 11.sp
                 )

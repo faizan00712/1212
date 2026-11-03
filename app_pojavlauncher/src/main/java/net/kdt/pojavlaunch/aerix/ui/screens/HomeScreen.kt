@@ -106,6 +106,8 @@ import net.kdt.pojavlaunch.aerix.components.MetaPill
 import net.kdt.pojavlaunch.aerix.components.QuickActionTile
 import net.kdt.pojavlaunch.aerix.components.QuietEmptyState
 import net.kdt.pojavlaunch.aerix.components.liquidGlass
+import net.kdt.pojavlaunch.aerix.components.LuciferGlassButton
+import net.kdt.pojavlaunch.aerix.components.luciferGlass
 import net.kdt.pojavlaunch.aerix.theme.AerixMetrics
 import net.kdt.pojavlaunch.aerix.theme.AerixRadii
 import net.kdt.pojavlaunch.aerix.guide.AerixGuideState
@@ -208,6 +210,10 @@ fun HomeScreen(activity: FragmentActivity, navigate: (LauncherSection) -> Unit) 
     // ActionMenu card on the right (weight 2.6f) whenever maxWidth >= 500.dp.
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val showActionMenu = maxWidth >= 500.dp
+        if (maxWidth >= 640.dp && maxWidth > maxHeight) {
+            LuciferHome(selected, actions, Modifier.fillMaxSize())
+            return@BoxWithConstraints
+        }
         Row(modifier = Modifier.fillMaxSize()) {
             BoxWithConstraints(
                 modifier = Modifier
@@ -973,3 +979,185 @@ private fun SameVersionNudgeStrip(
     }
 }
 
+
+
+@Composable
+private fun LuciferHome(selected: AerixInstance?, actions: HomeActions, modifier: Modifier = Modifier) {
+    val account = PojavAccountBridge.current
+    val vanilla = stringResource(R.string.aerix_home_vanilla)
+    val playerName = account?.username?.takeIf { it.isNotBlank() } ?: "PLAYER"
+    var azimuth by remember(account?.username) { mutableFloatStateOf(0f) }
+    val mcVersion = selected?.let { GameDownloadTarget.minecraftVersionIn(it.versionId) ?: it.versionId }
+    val loader = selected?.let { loaderLabel(it.versionId, vanilla) }
+    val cardShape = RoundedCornerShape(18.dp)
+
+    Box(modifier = modifier.padding(horizontal = 10.dp, vertical = 10.dp)) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxHeight()
+                .width(260.dp)
+                .padding(bottom = 36.dp)
+                .pointerInput(account?.username) {
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        azimuth = (azimuth + dragAmount * DOLL_DRAG_DEG_PER_PX).mod(360f)
+                    }
+                }
+        ) {
+            AerixSkinPreview3D(
+                account = account,
+                azimuth = azimuth.roundToInt(),
+                pitch = 0,
+                interactionEnabled = false,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .luciferGlass(cardShape)
+                .padding(horizontal = 18.dp, vertical = 8.dp)
+        ) {
+            Text("WELCOME BACK", color = Color.White.copy(alpha = 0.65f), fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = playerName.uppercase(),
+                color = Color.White,
+                fontSize = 24.sp,
+                letterSpacing = 1.5.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.width(150.dp)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .width(250.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .luciferGlass(RoundedCornerShape(16.dp))
+                    .clickable(role = Role.Button) { actions.accounts() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                AerixImageWell(image = account?.face, fallback = R.drawable.aerix_head_steve, size = 38.dp, radius = 8.dp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = playerName.uppercase(),
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        letterSpacing = 1.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = account?.authType?.name?.uppercase() ?: "NO ACCOUNT",
+                        color = Color.White.copy(alpha = 0.65f),
+                        fontSize = 9.sp,
+                        letterSpacing = 1.4.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1
+                    )
+                }
+                Box(Modifier.size(8.dp).background(if (account != null) Color.White else Color.White.copy(alpha = 0.3f), CircleShape))
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .luciferGlass(RoundedCornerShape(14.dp))
+                        .clickable(role = Role.Button) { actions.library() }
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = (selected?.name ?: stringResource(R.string.aerix_home_no_active_world)).uppercase(),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        letterSpacing = 1.2.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = if (selected == null) "SELECT INSTANCE" else "${mcVersion ?: ""} · ${loader ?: ""}".uppercase(),
+                        color = Color.White.copy(alpha = 0.65f),
+                        fontSize = 9.sp,
+                        letterSpacing = 1.2.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                LuciferGlassButton(
+                    text = if (selected != null) "LAUNCH" else "CREATE",
+                    onClick = if (selected != null) actions.play else actions.create,
+                    iconRes = R.drawable.aerix_ic_play_arrow_filled,
+                    height = 64.dp,
+                    strong = true,
+                    cornerRadius = 20.dp,
+                    fontSize = 24.sp,
+                    letterSpacing = 6.sp,
+                    modifier = Modifier.fillMaxWidth().guideAnchor(AerixGuideState.PLAY)
+                )
+                LuciferGlassButton(
+                    text = "ADD ACCOUNT",
+                    onClick = { AerixNav.navigate(LauncherSection.ADD_ACCOUNT) },
+                    iconRes = R.drawable.aerix_ic_add,
+                    height = 42.dp,
+                    fontSize = 13.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    LuciferSquare("VERSION", R.drawable.aerix_ic_dashboard_filled, actions.library, Modifier.weight(1f))
+                    LuciferSquare("MODS", R.drawable.aerix_ic_extension_outlined, actions.content, Modifier.weight(1f))
+                    LuciferSquare("SKINS", R.drawable.aerix_ic_person_outlined, actions.accounts, Modifier.weight(1f))
+                    LuciferSquare("CONTROLS", R.drawable.aerix_ic_sports_esports_outlined, actions.controls, Modifier.weight(1f))
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            listOfNotNull(mcVersion, loader).forEach { chip ->
+                Text(
+                    text = chip.uppercase(),
+                    color = Color.White,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.4.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .luciferGlass(RoundedCornerShape(10.dp))
+                        .padding(horizontal = 14.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LuciferSquare(label: String, iconRes: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .height(54.dp)
+            .luciferGlass(RoundedCornerShape(14.dp))
+            .clickable(role = Role.Button, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(painter = painterResource(iconRes), contentDescription = label, tint = Color.White, modifier = Modifier.size(18.dp))
+        Text(label, color = Color.White, fontSize = 8.sp, letterSpacing = 0.6.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+    }
+}

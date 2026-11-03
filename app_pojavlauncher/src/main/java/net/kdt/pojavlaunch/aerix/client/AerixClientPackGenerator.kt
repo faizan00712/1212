@@ -152,7 +152,7 @@ object AerixClientPackGenerator {
                         "Crimson & Obsidian!",
                         "Maximum Mobile FPS!",
                         "Waving 3D Animated Capes!",
-                        "Powered by Aerix Launcher!"
+                        "Powered by Lucifer Launcher!"
                     ).joinToString("\n")
                 )
             }

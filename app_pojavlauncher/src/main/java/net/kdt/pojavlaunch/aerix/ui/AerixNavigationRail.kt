@@ -152,7 +152,7 @@ fun AerixNavigationRail(
                     modifier = Modifier
                         .clip(RoundedCornerShape(AerixRadii.panelSmall))
                         .clickable(role = Role.Button) { onNavigate(LauncherSection.HOME) }
-                        .semantics { contentDescription = "Aerix Home" }
+                        .semantics { contentDescription = "Lucifer Home" }
                         .padding(vertical = AerixSpacing.xs),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(AerixSpacing.xxs)
@@ -172,13 +172,13 @@ fun AerixNavigationRail(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_aerix_mark),
-                            contentDescription = "Aerix",
+                            contentDescription = "Lucifer",
                             tint = Color.Unspecified,
                             modifier = Modifier.size(if (compactRail) 20.dp else 24.dp)
                         )
                     }
                     if (expandedRail) {
-                        Text(text = "AERIX", fontSize = 8.sp, letterSpacing = 1.1.sp, fontWeight = FontWeight.ExtraBold, color = AerixSurface.textSecondary)
+                        Text(text = "LUCIFER", fontSize = 8.sp, letterSpacing = 1.1.sp, fontWeight = FontWeight.ExtraBold, color = AerixSurface.textSecondary)
                     }
                 }
 
@@ -298,10 +298,10 @@ fun AerixBottomDock(
     }
 }
 
-private fun librarySelected(section: LauncherSection): Boolean =
+internal fun librarySelected(section: LauncherSection): Boolean =
     section == LauncherSection.LIBRARY || section == LauncherSection.INSTANCE_EDITOR || section == LauncherSection.CONTENT
 
-private fun discoverSelected(section: LauncherSection): Boolean =
+internal fun discoverSelected(section: LauncherSection): Boolean =
     section == LauncherSection.DISCOVER || section == LauncherSection.DOWNLOADS
 
 /**
@@ -309,11 +309,11 @@ private fun discoverSelected(section: LauncherSection): Boolean =
  * settings tab; the Settings entry stays highlighted for every other tab. Same pairing as mirai's
  * MiraiNavigationRail.kt LauncherSection.WALLPAPERS / SETTINGS handling.
  */
-private fun wallpapersSelected(section: LauncherSection): Boolean =
+internal fun wallpapersSelected(section: LauncherSection): Boolean =
     section == LauncherSection.WALLPAPERS ||
         (section == LauncherSection.SETTINGS && AerixNav.settingsTab == AerixNav.TAB_WALLPAPERS)
 
-private fun settingsSelected(section: LauncherSection): Boolean =
+internal fun settingsSelected(section: LauncherSection): Boolean =
     (section == LauncherSection.SETTINGS && AerixNav.settingsTab != AerixNav.TAB_WALLPAPERS) ||
         section == LauncherSection.ABOUT || section == LauncherSection.LOGS
 

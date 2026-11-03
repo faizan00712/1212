@@ -922,11 +922,11 @@ object AerixDiscordPresence {
         val usingMinecraftProfile = isMinecraftCatalogId(connectedAppId)
         val clickable = AerixPreferences.discordClickableLinks
 
-        val cardName = if (usingMinecraftProfile) "Minecraft" else "Aerix Launcher"
+        val cardName = if (usingMinecraftProfile) "Minecraft" else "Lucifer Launcher"
         // status_display_type: 0 = Name ("Playing Minecraft"), 2 = Details ("In the launcher" / "Playing Minecraft 1.21")
         val statusDisplayType = if (usingMinecraftProfile) 0 else 2
-        val effectiveDetails = if (usingMinecraftProfile && !details.contains("Aerix", ignoreCase = true)) {
-            "$details · via Aerix Launcher"
+        val effectiveDetails = if (usingMinecraftProfile && !details.contains("Lucifer", ignoreCase = true)) {
+            "$details · via Lucifer Launcher"
         } else {
             details
         }
@@ -961,16 +961,16 @@ object AerixDiscordPresence {
         val validPackIcon = activeModpackIconUrl?.takeIf { clickable && inGameMode && isValidHttpAssetUrl(it) }
         if (validPackIcon != null) {
             assets.put("large_image", validPackIcon)
-            assets.put("large_text", "$state · Aerix Launcher")
+            assets.put("large_text", "$state · Lucifer Launcher")
             assets.put("small_image", AERIX_LOGO_URL)
-            assets.put("small_text", "Aerix Launcher — Tap to join Discord")
+            assets.put("small_text", "Lucifer Launcher — Tap to join Discord")
         } else {
             assets.put("large_image", AERIX_LOGO_URL)
             assets.put("large_text", if (usingMinecraftProfile)
-                "Aerix Launcher — Minecraft Java Edition on Android" else "Aerix Launcher — Official Website & Info")
+                "Lucifer Launcher — Minecraft Java Edition on Android" else "Lucifer Launcher — Official Website & Info")
             if (usingMinecraftProfile) {
                 assets.put("small_image", AERIX_LOGO_URL)
-                assets.put("small_text", "Powered by Aerix Launcher")
+                assets.put("small_text", "Powered by Lucifer Launcher")
             }
         }
         if (clickable) {
@@ -982,7 +982,7 @@ object AerixDiscordPresence {
                 val buttons = JSONArray()
                     .put(
                         JSONObject()
-                            .put("label", "About Aerix Launcher")
+                            .put("label", "About Lucifer Launcher")
                             .put("url", AERIX_WEBSITE_URL)
                     )
                     .put(

@@ -111,7 +111,7 @@ fun DiscordPresenceSettingsCard() {
         MiraiSwitchSettingsCard(
             position = CardPosition.Top,
             title = "Discord Rich Presence",
-            summary = "Show what you are doing in Aerix Launcher on your Discord profile, " +
+            summary = "Show what you are doing in Lucifer Launcher on your Discord profile, " +
                 "and clear when you leave the app or close the game.",
             checked = enabled,
             onCheckedChange = { on ->
@@ -128,10 +128,10 @@ fun DiscordPresenceSettingsCard() {
         MiraiSwitchSettingsCard(
             position = CardPosition.Middle,
             title = "Official Minecraft Game Profile in-game",
-            summary = "Hybrid mode: shows the clickable Aerix Launcher card while in the launcher, " +
+            summary = "Hybrid mode: shows the clickable Lucifer Launcher card while in the launcher, " +
                 "and switches to Minecraft's verified Discord ID while playing so tapping your " +
-                "presence opens Minecraft's official full Game Profile sheet (\u201Cvia Aerix Launcher\u201D). " +
-                "Turn off to keep \u201CAerix Launcher\u201D as the card title everywhere.",
+                "presence opens Minecraft's official full Game Profile sheet (\u201Cvia Lucifer Launcher\u201D). " +
+                "Turn off to keep \u201CLucifer Launcher\u201D as the card title everywhere.",
             checked = gameProfileMode,
             enabled = enabled,
             onCheckedChange = { on ->
@@ -145,7 +145,7 @@ fun DiscordPresenceSettingsCard() {
             position = CardPosition.Middle,
             title = "Modpack art, clickable info links & buttons",
             summary = "Show modpack cover artwork, make the headline & status clickable " +
-                "(opening the official Aerix website & Discord), and display \u201CAbout Aerix Launcher\u201D " +
+                "(opening the official Aerix website & Discord), and display \u201CAbout Lucifer Launcher\u201D " +
                 "+ \u201CJoin Aerix Discord\u201D buttons on your profile card.",
             checked = clickableLinks,
             enabled = enabled,
@@ -174,7 +174,7 @@ fun DiscordPresenceSettingsCard() {
         MiraiTextInputSettingsCard(
             value = appId,
             title = "Discord application ID",
-            summary = "Already set to the Aerix Launcher application, so nothing has to be done here. " +
+            summary = "Already set to the Lucifer Launcher application, so nothing has to be done here. " +
                 "Fill this in only to publish under a custom Discord application ID.",
             label = "Built in: 1563812135744839771 — override if you know why",
             position = CardPosition.Bottom,
@@ -200,15 +200,15 @@ private fun DiscordRichPresenceLivePreview(
     val accent = AerixThemeManager.currentAccent()
     val usingOfficialMcProfile = previewInGame && gameProfileMode
 
-    val cardHeader = if (usingOfficialMcProfile) "Playing a game" else "Playing Aerix Launcher"
+    val cardHeader = if (usingOfficialMcProfile) "Playing a game" else "Playing Lucifer Launcher"
     val titleLine = when {
         usingOfficialMcProfile -> "Minecraft"
         previewInGame -> "Playing Minecraft 1.21.4"
         else -> "In the launcher"
     }
     val detailsLine = when {
-        usingOfficialMcProfile -> "Playing Minecraft 1.21.4 · via Aerix Launcher"
-        previewInGame -> "Aerix Launcher · Survival SMP"
+        usingOfficialMcProfile -> "Playing Minecraft 1.21.4 · via Lucifer Launcher"
+        previewInGame -> "Lucifer Launcher · Survival SMP"
         else -> "Browsing the dashboard"
     }
     val stateLine = if (usingOfficialMcProfile) "Survival SMP (2 of 4)" else null
@@ -395,7 +395,7 @@ private fun DiscordRichPresenceLivePreview(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         DiscordActionButtonPreview(
-                            label = "About Aerix Launcher",
+                            label = "About Lucifer Launcher",
                             modifier = Modifier.weight(1f),
                             onClick = onOpenWebsite
                         )
@@ -412,7 +412,7 @@ private fun DiscordRichPresenceLivePreview(
         Text(
             text = if (usingOfficialMcProfile) {
                 "Tip: In Official Minecraft mode, friends tapping the game card open Minecraft's native " +
-                    "Discord Game Profile sheet, while tapping the text/buttons opens Aerix Launcher's website & Discord."
+                    "Discord Game Profile sheet, while tapping the text/buttons opens Lucifer Launcher's website & Discord."
             } else {
                 "Note: Discord shows Rich Presence action buttons to friends and server members viewing your " +
                     "profile (tap any link or button above to test where it opens)."

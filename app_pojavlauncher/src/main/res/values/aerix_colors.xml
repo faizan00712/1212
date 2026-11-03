@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Aerix glass palette, ported from mirai-launcher- ui/theme/AerixSurface.kt -->
 <resources>
-    <color name="aerix_canvas">#FF06050A</color>
-    <color name="aerix_panel">#9D1C1830</color>
-    <color name="aerix_panel_raised">#B02A2342</color>
-    <color name="aerix_panel_solid">#FF120F1E</color>
-    <color name="aerix_panel_raised_solid">#FF1E1933</color>
-    <color name="aerix_border">#5CF1ECFF</color>
-    <color name="aerix_border_soft">#2EF1ECFF</color>
-    <color name="aerix_accent">#FF8B5CF6</color>
-    <color name="aerix_action">#FF6D28D9</color>
-    <color name="aerix_on_accent">#FFFFFFFF</color>
-    <color name="aerix_glass_blue">#FFC4B5FD</color>
-    <color name="aerix_glass_violet">#FF8B5CF6</color>
+    <color name="aerix_canvas">#FF000000</color>
+    <color name="aerix_panel">#2EFFFFFF</color>
+    <color name="aerix_panel_raised">#3DFFFFFF</color>
+    <color name="aerix_panel_solid">#FF0C0C0E</color>
+    <color name="aerix_panel_raised_solid">#FF1A1A1E</color>
+    <color name="aerix_border">#70FFFFFF</color>
+    <color name="aerix_border_soft">#42FFFFFF</color>
+    <color name="aerix_accent">#FFE9E9EE</color>
+    <color name="aerix_action">#FF2A2A2E</color>
+    <color name="aerix_on_accent">#FF0A0A0C</color>
+    <color name="aerix_glass_blue">#FFD6D6DC</color>
+    <color name="aerix_glass_violet">#FFE9E9EE</color>
     <color name="aerix_text_primary">#FFF1F6FA</color>
-    <color name="aerix_text_secondary">#FFB0A8C4</color>
-    <color name="aerix_text_muted">#FF9A93B0</color>
+    <color name="aerix_text_secondary">#FFC4C4CC</color>
+    <color name="aerix_text_muted">#FF9C9CA6</color>
     <color name="aerix_success">#FF73E5B0</color>
     <color name="aerix_warning">#FFFFC777</color>
     <color name="aerix_danger">#FFFF7189</color>

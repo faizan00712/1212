@@ -504,8 +504,8 @@ object AerixSkinServer {
         }
         root.add("skinDomains", domains)
         val meta = JsonObject().apply {
-            addProperty("serverName", "Aerix Launcher (local)")
-            addProperty("implementationName", "Aerix Launcher")
+            addProperty("serverName", "Lucifer Launcher (local)")
+            addProperty("implementationName", "Lucifer Launcher")
             addProperty("implementationVersion", "1.6")
             addProperty("feature.no_mojang_namespace", !passThrough)
             addProperty("feature.enable_profile_key", true)

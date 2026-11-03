@@ -55,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.IntOffset
 import androidx.fragment.app.FragmentActivity
 import net.kdt.pojavlaunch.aerix.bridge.AerixPreferences
@@ -167,7 +168,19 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
         // The wallpaper and the festival effects run to the edges of the display; the shell
         // itself stays clear of the camera cutout and of the system bars.
         Box(modifier = Modifier.fillMaxSize().padding(AerixWindowInsets.padding())) {
-            Column(modifier = Modifier.fillMaxSize()) {
+            val screenConfig = LocalConfiguration.current
+            val sideNav = screenConfig.screenWidthDp >= 720 &&
+                screenConfig.screenWidthDp > screenConfig.screenHeightDp &&
+                section != LauncherSection.SOCIALS
+            Row(modifier = Modifier.fillMaxSize()) {
+            if (sideNav) {
+                LuciferSideNav(
+                    selectedSection = section,
+                    onNavigate = navigate,
+                    onCreateInstance = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) }
+                )
+            }
+            Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -244,13 +257,14 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
 
                 // The social space has its own sidebar and takes the whole window; every other
                 // section gets the launcher's bottom dock.
-                if (section != LauncherSection.SOCIALS) {
+                if (section != LauncherSection.SOCIALS && !sideNav) {
                     AerixBottomDock(
                         selectedSection = section,
                         onNavigate = navigate,
                         onCreateInstance = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) }
                     )
                 }
+            }
             }
 
             FestivalTitleText(

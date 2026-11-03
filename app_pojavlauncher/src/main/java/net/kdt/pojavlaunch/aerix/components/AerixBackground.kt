@@ -50,8 +50,8 @@ import net.kdt.pojavlaunch.aerix.theme.AerixSurface
 import net.kdt.pojavlaunch.aerix.theme.AerixThemeManager
 import net.kdt.pojavlaunch.aerix.theme.ThemeMotion
 
-private val DarkBackgroundTop = Color(0xFF04070A)
-private val DarkBackgroundBottom = Color(0xFF0A0F14)
+private val DarkBackgroundTop = Color(0xFF000000)
+private val DarkBackgroundBottom = Color(0xFF000000)
 
 private var wallpaperCacheKey: String? = null
 private var wallpaperCacheBitmap: ImageBitmap? = null
@@ -168,6 +168,7 @@ fun AerixBackground(modifier: Modifier = Modifier, content: @Composable BoxScope
                         }
                     )
             )
+            if (id == AerixThemeManager.WALLPAPER_NONE) LuciferDots()
         }
         content()
     }

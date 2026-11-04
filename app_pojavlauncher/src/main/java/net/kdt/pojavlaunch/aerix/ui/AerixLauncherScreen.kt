@@ -173,14 +173,14 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
                 screenConfig.screenWidthDp > screenConfig.screenHeightDp &&
                 section != LauncherSection.SOCIALS
             Row(modifier = Modifier.fillMaxSize()) {
-            if (sideNav) {
-                LuciferSideNav(
-                    selectedSection = section,
-                    onNavigate = navigate,
-                    onCreateInstance = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) }
-                )
-            }
             Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                if (sideNav) {
+                    LuciferTopNav(
+                        selectedSection = section,
+                        onNavigate = navigate,
+                        onCreateInstance = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) }
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .weight(1f)

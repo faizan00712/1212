@@ -17,21 +17,21 @@ import java.net.URLEncoder;
 
 public class FabriclikeUtils {
 
-    public static final FabriclikeUtils FABRIC_UTILS = new FabriclikeUtils("https://meta.fabricmc.net/v2", "fabric", "Fabric", "fabric");
-    public static final FabriclikeUtils QUILT_UTILS = new FabriclikeUtils("https://meta.quiltmc.org/v3", "quilt", "Quilt", "quilt");
-    public static final FabriclikeUtils LEGACY_FABRIC_UTILS = new FabriclikeUtils("https://meta.legacyfabric.net/v2", "legacy_fabric", "Legacy Fabric", "fabric");
-    private static final String LOADER_METADATA_URL = "%s/versions/loader/%s";
-    private static final String GAME_METADATA_URL = "%s/versions/game";
+    public static final FabriclikeUtils FABRIC_UTILS = new FabriclikeUtils("https://meta.fabricmc.net/v2", "https://bmclapi2.bangbang93.com/fabric-meta/v2", "fabric", "Fabric", "fabric");
+    public static final FabriclikeUtils QUILT_UTILS = new FabriclikeUtils("https://meta.quiltmc.org/v3", "https://bmclapi2.bangbang93.com/quilt-meta/v3", "quilt", "Quilt", "quilt");
+    public static final FabriclikeUtils LEGACY_FABRIC_UTILS = new FabriclikeUtils("https://meta.legacyfabric.net/v2", null, "legacy_fabric", "Legacy Fabric", "fabric");
 
     private static final String JSON_DOWNLOAD_URL = "%s/versions/loader/%s/%s/profile/json";
 
     private final String mApiUrl;
+    private final String mMirrorUrl;
     private final String mCachePrefix;
     private final String mName;
     private final String mIconName;
 
-    private FabriclikeUtils(String mApiUrl, String cachePrefix, String mName, String iconName) {
+    private FabriclikeUtils(String mApiUrl, String mirrorUrl, String cachePrefix, String mName, String iconName) {
         this.mApiUrl = mApiUrl;
+        this.mMirrorUrl = mirrorUrl;
         this.mCachePrefix = cachePrefix;
         this.mIconName = iconName;
         this.mName = mName;
@@ -39,7 +39,7 @@ public class FabriclikeUtils {
 
     public FabricVersion[] downloadGameVersions() throws IOException{
         try {
-            return DownloadUtils.downloadStringCached(String.format(GAME_METADATA_URL, mApiUrl), mCachePrefix+"_game_versions",
+            return cachedWithMirror("/versions/game", mCachePrefix+"_game_versions",
                     FabriclikeUtils::deserializeRawVersions
             );
         }catch (DownloadUtils.ParseException ignored) {}
@@ -49,7 +49,7 @@ public class FabriclikeUtils {
     public FabricVersion[] downloadLoaderVersions(String gameVersion) throws IOException{
         try {
             String urlEncodedGameVersion = URLEncoder.encode(gameVersion, "UTF-8");
-            return DownloadUtils.downloadStringCached(String.format(LOADER_METADATA_URL, mApiUrl, urlEncodedGameVersion),
+            return cachedWithMirror("/versions/loader/" + urlEncodedGameVersion,
                     mCachePrefix+"_loader_versions."+urlEncodedGameVersion,
                     (input)->{ try {
                         return deserializeLoaderVersions(input);
@@ -63,14 +63,49 @@ public class FabriclikeUtils {
         return null;
     }
 
+    private <T> T cachedWithMirror(String path, String cacheName, DownloadUtils.ParseCallback<T> parser)
+            throws IOException, DownloadUtils.ParseException {
+        try {
+            return DownloadUtils.downloadStringCached(mApiUrl + path, cacheName, parser);
+        } catch (IOException e) {
+            if (mMirrorUrl == null) throw e;
+            return DownloadUtils.downloadStringCached(mMirrorUrl + path, cacheName, parser);
+        }
+    }
+
+    private String downloadJson(String gameVersion, String loaderVersion) throws IOException {
+        String[] bases = mMirrorUrl == null ? new String[]{mApiUrl, mApiUrl} : new String[]{mApiUrl, mApiUrl, mMirrorUrl};
+        IOException last = null;
+        for (int i = 0; i < bases.length; i++) {
+            try {
+                return DownloadUtils.downloadString(createJsonDownloadUrl(bases[i], gameVersion, loaderVersion));
+            } catch (IOException e) {
+                last = e;
+                if (i + 1 < bases.length) {
+                    try {
+                        Thread.sleep(800);
+                    } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Install interrupted", interrupted);
+                    }
+                }
+            }
+        }
+        throw last;
+    }
+
     public String createJsonDownloadUrl(String gameVersion, String loaderVersion) {
+        return createJsonDownloadUrl(mApiUrl, gameVersion, loaderVersion);
+    }
+
+    private String createJsonDownloadUrl(String apiUrl, String gameVersion, String loaderVersion) {
         try {
             gameVersion = URLEncoder.encode(gameVersion, "UTF-8");
             loaderVersion = URLEncoder.encode(loaderVersion, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-        return String.format(JSON_DOWNLOAD_URL, mApiUrl, gameVersion, loaderVersion);
+        return String.format(JSON_DOWNLOAD_URL, apiUrl, gameVersion, loaderVersion);
     }
 
     public String getName() {
@@ -81,7 +116,7 @@ public class FabriclikeUtils {
     }
 
     public String install(String gameVersion, String loaderVersion) throws IOException {
-        String fabricJson = DownloadUtils.downloadString(createJsonDownloadUrl(gameVersion, loaderVersion));
+        String fabricJson = downloadJson(gameVersion, loaderVersion);
         String versionId;
         try {
             JSONObject fabricJsonObject = new JSONObject(fabricJson);

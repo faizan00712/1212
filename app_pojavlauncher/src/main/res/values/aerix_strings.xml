@@ -448,6 +448,7 @@
     <string name="aerix_create_install_short">Install</string>
     <string name="aerix_create_installing">Creating the instance</string>
     <string name="aerix_create_done">"%1$s" created</string>
+    <string name="aerix_create_builds_failed">Could not load builds. Check your connection</string>
     <string name="aerix_create_failed">The instance could not be created</string>
     <string name="aerix_create_need_version">Pick a Minecraft version first</string>
     <string name="aerix_create_need_loader">Pick a %1$s build first</string>

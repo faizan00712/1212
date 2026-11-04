@@ -151,6 +151,7 @@ fun CreateInstanceScreen(activity: FragmentActivity, onClose: () -> Unit) {
 
     LaunchedEffect(loader, selectedVersion) {
         loaderBuild = null
+        loaderVersions = null
         buildsFailed = false
         if (!loader.usesGameVersion) {
             loadingBuilds = true
@@ -211,6 +212,7 @@ fun CreateInstanceScreen(activity: FragmentActivity, onClose: () -> Unit) {
     }
     val selectedType = versions.firstOrNull { it.id == selectedVersion && it.type != AerixVersionType.INSTALLED }?.type
     val onPick: (String) -> Unit = { selectedVersion = it }
+    val showBuilds = loader != AerixLoader.VANILLA && loader.hasBuilds
 
     Column(
         modifier = Modifier
@@ -244,20 +246,12 @@ fun CreateInstanceScreen(activity: FragmentActivity, onClose: () -> Unit) {
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 3.sp
             )
-            Text(
-                text = "THREE DIMENSIONS \u00B7 PICK ONE",
-                color = Color.White.copy(alpha = 0.55f),
-                fontSize = 10.sp,
-                letterSpacing = 2.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1
-            )
             Spacer(Modifier.weight(1f))
             ModrinthCompactSearchField(
                 value = filter,
                 onValueChange = { filter = it },
                 placeholder = stringResource(R.string.aerix_create_filter_hint),
-                modifier = Modifier.width(190.dp)
+                modifier = Modifier.width(170.dp)
             )
             LuciferGlassButton(
                 text = stringResource(R.string.aerix_create_import_modpack),
@@ -297,17 +291,59 @@ fun CreateInstanceScreen(activity: FragmentActivity, onClose: () -> Unit) {
                 onPick = onPick,
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
-            DimensionPanel(
-                title = "THE END",
-                subtitle = "Old beta & alpha \u00B7 ${oldIds.size}",
-                banner = Color(0xFF7A45D6),
-                ids = oldIds,
-                installed = installedIds,
-                selected = selectedVersion,
-                emptyText = stringResource(R.string.aerix_create_filter_empty),
-                onPick = onPick,
-                modifier = Modifier.weight(1f).fillMaxHeight()
-            )
+            if (showBuilds) {
+                DimensionPanel(
+                    title = loader.displayName.uppercase(),
+                    subtitle = "Loader builds \u00B7 ${visibleBuilds.size}",
+                    banner = Color(0xFF7A45D6),
+                    ids = visibleBuilds.map { it.id },
+                    labels = visibleBuilds.associate { it.id to it.label },
+                    installed = emptySet(),
+                    selected = loaderBuild?.id,
+                    emptyText = when {
+                        loadingBuilds -> stringResource(R.string.aerix_create_loader_loading)
+                        buildsFailed -> stringResource(R.string.aerix_create_builds_failed)
+                        else -> stringResource(
+                            R.string.aerix_create_loader_empty,
+                            loader.displayName,
+                            selectedVersion ?: stringResource(R.string.aerix_create_versions_empty)
+                        )
+                    },
+                    onPick = { id -> loaderBuild = visibleBuilds.firstOrNull { it.id == id } },
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    trailing = {
+                        Text(
+                            text = stringResource(R.string.aerix_create_only_stable).uppercase(),
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 8.sp,
+                            letterSpacing = 1.sp
+                        )
+                        Switch(
+                            checked = onlyStable,
+                            onCheckedChange = { onlyStable = it },
+                            modifier = Modifier.height(22.dp),
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.Black,
+                                checkedTrackColor = Color.White,
+                                uncheckedThumbColor = AerixSurface.textSecondary,
+                                uncheckedTrackColor = AerixSurface.panelTrack
+                            )
+                        )
+                    }
+                )
+            } else {
+                DimensionPanel(
+                    title = "THE END",
+                    subtitle = "Old beta & alpha \u00B7 ${oldIds.size}",
+                    banner = Color(0xFF7A45D6),
+                    ids = oldIds,
+                    installed = installedIds,
+                    selected = selectedVersion,
+                    emptyText = stringResource(R.string.aerix_create_filter_empty),
+                    onPick = onPick,
+                    modifier = Modifier.weight(1f).fillMaxHeight()
+                )
+            }
         }
 
         Column(
@@ -427,81 +463,6 @@ fun CreateInstanceScreen(activity: FragmentActivity, onClose: () -> Unit) {
                 )
             }
 
-            if (loader.usesGameVersion && loader.hasBuilds) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = loader.displayName.uppercase(),
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 9.sp,
-                        letterSpacing = 1.4.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    when {
-                        loadingBuilds -> {
-                            CircularProgressIndicator(
-                                color = Color.White,
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.aerix_create_loader_loading),
-                                color = Color.White.copy(alpha = 0.6f),
-                                fontSize = 11.sp
-                            )
-                        }
-                        visibleBuilds.isEmpty() -> {
-                            Text(
-                                text = if (buildsFailed) stringResource(R.string.aerix_create_failed)
-                                else stringResource(
-                                    R.string.aerix_create_loader_empty,
-                                    loader.displayName,
-                                    selectedVersion ?: stringResource(R.string.aerix_create_versions_empty)
-                                ),
-                                color = AerixSurface.warning,
-                                fontSize = 11.sp
-                            )
-                        }
-                        else -> {
-                            Row(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .horizontalScroll(rememberScrollState()),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                visibleBuilds.forEach { build ->
-                                    BuildChip(
-                                        label = build.label,
-                                        stable = build.stable,
-                                        selected = build.id == loaderBuild?.id,
-                                        onClick = { loaderBuild = build }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Text(
-                        text = stringResource(R.string.aerix_create_only_stable).uppercase(),
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 9.sp,
-                        letterSpacing = 1.2.sp
-                    )
-                    Switch(
-                        checked = onlyStable,
-                        onCheckedChange = { onlyStable = it },
-                        modifier = Modifier.height(22.dp),
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.Black,
-                            checkedTrackColor = Color.White,
-                            uncheckedThumbColor = AerixSurface.textSecondary,
-                            uncheckedTrackColor = AerixSurface.panelTrack
-                        )
-                    )
-                }
-            }
         }
     }
 }
@@ -516,7 +477,9 @@ private fun DimensionPanel(
     selected: String?,
     emptyText: String,
     onPick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    labels: Map<String, String> = emptyMap(),
+    trailing: (@Composable androidx.compose.foundation.layout.RowScope.() -> Unit)? = null
 ) {
     Column(modifier = modifier.luciferGlass(RoundedCornerShape(22.dp))) {
         Box(
@@ -545,6 +508,16 @@ private fun DimensionPanel(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+            if (trailing != null) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    content = trailing
+                )
+            }
         }
         if (ids.isEmpty()) {
             Box(
@@ -568,6 +541,7 @@ private fun DimensionPanel(
                 items(ids, key = { it }) { id ->
                     VersionSlot(
                         id = id,
+                        label = labels[id] ?: id,
                         installed = id in installed,
                         selected = id == selected,
                         onClick = { onPick(id) }
@@ -579,7 +553,7 @@ private fun DimensionPanel(
 }
 
 @Composable
-private fun VersionSlot(id: String, installed: Boolean, selected: Boolean, onClick: () -> Unit) {
+private fun VersionSlot(id: String, label: String, installed: Boolean, selected: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(10.dp)
     Row(
         modifier = Modifier
@@ -598,7 +572,7 @@ private fun VersionSlot(id: String, installed: Boolean, selected: Boolean, onCli
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = id,
+            text = label,
             color = Color.White,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
@@ -650,30 +624,5 @@ private fun LoaderSlot(loader: AerixLoader, selected: Boolean, onClick: () -> Un
             fontWeight = FontWeight.Bold,
             maxLines = 1
         )
-    }
-}
-
-@Composable
-private fun BuildChip(label: String, stable: Boolean, selected: Boolean, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(10.dp)
-    Row(
-        modifier = Modifier
-            .height(28.dp)
-            .clip(shape)
-            .background(if (selected) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.4f))
-            .border(
-                width = if (selected) 1.5.dp else 1.dp,
-                color = Color.White.copy(alpha = if (selected) 1f else 0.22f),
-                shape = shape
-            )
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        Text(text = label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-        if (stable) {
-            Text(text = "\u2713", color = Color.White.copy(alpha = 0.8f), fontSize = 10.sp)
-        }
     }
 }

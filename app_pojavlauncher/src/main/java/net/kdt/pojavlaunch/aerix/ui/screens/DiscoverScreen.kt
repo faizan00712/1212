@@ -42,6 +42,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.border
+import net.kdt.pojavlaunch.aerix.components.luciferGlass
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -842,137 +844,70 @@ internal fun ResultProjectLayout(
     modifier: Modifier = Modifier
 ) {
     val icon = rememberRemoteBitmap(project.iconUrl, targetMinEdgePx = 96)
-    val accent = AerixThemeManager.currentAccent()
-    val primaryBadgeText = remember(project.loaders, project.platform) {
-        val loaderLabels = project.loaders.take(2).joinToString(" \u2022 ")
-        loaderLabels.ifBlank { project.platform.displayName }
-    }
-
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(AerixRadii.cardSmall),
-        color = AerixSurface.panelRaised,
-        contentColor = Color.White,
-        border = BorderStroke(AerixSpacing.hairline, AerixSurface.borderSoft),
-        onClick = onClick
+    val downloadsText = remember(project.downloads) { formatDownloadCount(project.downloads) }
+    val shape = RoundedCornerShape(24.dp)
+    Box(
+        modifier = modifier
+            .luciferGlass(shape, strong = isInstalled)
+            .clickable(role = Role.Button, onClick = onClick)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(AerixSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(AerixSpacing.sm)
+                .padding(horizontal = 12.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // Top Row: 40dp Icon + Bold Title + Download Count Pill
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(AerixSpacing.smPlus)
-            ) {
-                AerixImageWell(
-                    image = icon,
-                    fallback = R.drawable.aerix_ic_extension_outlined,
-                    size = 40.dp,
-                    radius = AerixRadii.controlSmall
-                )
-
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = project.title,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                val downloadsText = remember(project.downloads) { formatDownloadCount(project.downloads) }
-                Surface(
-                    shape = RoundedCornerShape(AerixRadii.control),
-                    color = AerixSurface.panel
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = AerixSpacing.sm, vertical = AerixSpacing.tiny),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(AerixSpacing.tiny)
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(12.dp),
-                            painter = painterResource(R.drawable.aerix_ic_download_2_outlined),
-                            contentDescription = null,
-                            tint = AerixSurface.textSecondary
-                        )
-                        Text(
-                            text = downloadsText,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AerixSurface.textPrimary
-                        )
-                    }
-                }
-            }
-
-            // Middle: 2-line Summary Description
+            AerixImageWell(
+                image = icon,
+                fallback = R.drawable.aerix_ic_extension_outlined,
+                size = 56.dp,
+                radius = 16.dp
+            )
             Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = project.description,
-                fontSize = 12.sp,
-                color = AerixSurface.textSecondary,
-                maxLines = 2,
-                minLines = 2,
+                text = project.title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-
-            // Loader badge pill + Favorite button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(AerixSpacing.sm)
+            Text(
+                text = "$downloadsText DOWNLOADS".uppercase(),
+                fontSize = 9.sp,
+                letterSpacing = 1.4.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White.copy(alpha = 0.55f),
+                maxLines = 1
+            )
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .luciferGlass(CircleShape, strong = isInstalled),
+                contentAlignment = Alignment.Center
             ) {
-                Surface(
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(AerixRadii.control),
-                    color = AerixSurface.panel
-                ) {
-                    Text(
-                        text = primaryBadgeText,
-                        modifier = Modifier.padding(horizontal = AerixSpacing.smPlus, vertical = AerixSpacing.xs),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = AerixSurface.textPrimary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                FavoriteToggleLabel(
-                    isFavorite = isFavorite,
-                    onClick = onFavoriteClick,
-                    modifier = Modifier.height(32.dp)
+                Icon(
+                    painter = painterResource(if (isInstalled) R.drawable.aerix_ic_check else R.drawable.aerix_ic_add),
+                    contentDescription = if (isInstalled) "Installed" else "Install",
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
                 )
             }
-
-            // Full-width Install / Installed button
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                shape = RoundedCornerShape(AerixRadii.controlSmall),
-                color = if (isInstalled) AerixSurface.accentContainer else accent,
-                contentColor = if (isInstalled) accent else AerixSurface.onAccent,
-                onClick = onClick
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (isInstalled) "Installed" else "Install",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                }
-            }
         }
+        Icon(
+            painter = painterResource(
+                if (isFavorite) R.drawable.aerix_ic_favorite_filled else R.drawable.aerix_ic_favorite_outlined
+            ),
+            contentDescription = "Favorite",
+            tint = if (isFavorite) Color.White else Color.White.copy(alpha = 0.5f),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(6.dp)
+                .size(28.dp)
+                .clip(CircleShape)
+                .clickable(onClick = onFavoriteClick)
+                .padding(6.dp)
+        )
     }
 }
 

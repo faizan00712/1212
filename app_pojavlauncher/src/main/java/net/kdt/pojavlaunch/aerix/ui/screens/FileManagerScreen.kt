@@ -44,10 +44,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import net.kdt.pojavlaunch.aerix.components.luciferGlass
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -444,13 +450,15 @@ fun FileManagerScreen(activity: FragmentActivity) {
             shown.isEmpty() -> QuietEmptyState(R.drawable.aerix_ic_folder_outlined, stringResource(
                 if (searchResults != null) R.string.aerix_files_no_match else R.string.aerix_files_empty
             ))
-            else -> LazyColumn(
+            else -> LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = AerixSpacing.xxl),
-                verticalArrangement = Arrangement.spacedBy(AerixSpacing.xs)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(shown, key = { it.file.absolutePath }) { item ->
-                    FileRow(
+                    FileTile(
                         item = item,
                         selected = item.file in selection,
                         onClick = {
@@ -548,6 +556,51 @@ private fun Breadcrumb(root: File, current: File, rootLabel: String, modifier: M
                     .padding(horizontal = AerixSpacing.xs, vertical = AerixSpacing.xxs)
             )
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FileTile(item: FileItem, selected: Boolean, onClick: () -> Unit, onLongClick: () -> Unit) {
+    val context = LocalContext.current
+    val shape = RoundedCornerShape(20.dp)
+    val meta = if (item.isDirectory) {
+        if (item.childCount >= 0) context.resources.getQuantityString(R.plurals.aerix_files_items, item.childCount, item.childCount) else ""
+    } else {
+        Formatter.formatShortFileSize(context, item.size)
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(112.dp)
+            .luciferGlass(shape, strong = selected)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(if (selected) R.drawable.aerix_ic_check else fileIcon(item.file, item.isDirectory)),
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            item.name,
+            color = Color.White,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            meta.uppercase(),
+            color = Color.White.copy(alpha = 0.55f),
+            fontSize = 9.sp,
+            letterSpacing = 1.2.sp,
+            maxLines = 1
+        )
     }
 }
 

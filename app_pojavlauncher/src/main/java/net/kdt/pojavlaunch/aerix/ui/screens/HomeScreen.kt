@@ -1001,93 +1001,65 @@ private fun LuciferHome(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column(
-            modifier = Modifier.weight(1.15f).fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier.weight(0.9f).fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .luciferGlass(RoundedCornerShape(26.dp), strong = true)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                    .luciferGlass(RoundedCornerShape(22.dp), strong = true)
+                    .clickable(role = Role.Button) { actions.library() }
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().clickable(role = Role.Button) { actions.library() },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    AerixImageWell(
-                        image = selected?.icon,
-                        fallback = R.drawable.aerix_ic_videogame_asset_outlined,
-                        size = 62.dp,
-                        radius = 16.dp
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (selected == null) "NO ACTIVE WORLD" else "CONTINUE PLAYING",
-                            color = Color.White.copy(alpha = 0.65f),
-                            fontSize = 9.sp,
-                            letterSpacing = 2.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = (selected?.name ?: stringResource(R.string.aerix_home_no_active_world)).uppercase(),
-                            color = Color.White,
-                            fontSize = 22.sp,
-                            letterSpacing = 1.5.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = if (selected == null) "SELECT OR CREATE ONE" else "${mcVersion ?: ""} · ${loader ?: ""}".uppercase(),
-                            color = Color.White.copy(alpha = 0.65f),
-                            fontSize = 10.sp,
-                            letterSpacing = 1.4.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-                Spacer(Modifier.weight(1f))
-                LuciferGlassButton(
-                    text = if (selected != null) "LAUNCH" else "CREATE",
-                    onClick = if (selected != null) actions.play else actions.create,
-                    iconRes = R.drawable.aerix_ic_play_arrow_filled,
-                    height = 54.dp,
-                    strong = true,
-                    cornerRadius = 27.dp,
-                    fontSize = 22.sp,
-                    letterSpacing = 6.sp,
-                    modifier = Modifier.fillMaxWidth().guideAnchor(AerixGuideState.PLAY)
+                AerixImageWell(
+                    image = selected?.icon,
+                    fallback = R.drawable.aerix_ic_videogame_asset_outlined,
+                    size = 52.dp,
+                    radius = 14.dp
                 )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = if (selected == null) "NO ACTIVE WORLD" else "LAST PLAYED",
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 9.sp,
+                        letterSpacing = 2.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = selected?.name ?: stringResource(R.string.aerix_home_no_active_world),
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = if (selected == null) "SELECT OR CREATE ONE" else "${mcVersion ?: ""} \u00B7 ${loader ?: ""}".uppercase(),
+                        color = Color.White.copy(alpha = 0.6f),
+                        fontSize = 9.sp,
+                        letterSpacing = 1.4.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth().height(76.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                LuciferTile("VERSIONS", R.drawable.aerix_ic_dashboard_filled, actions.library, Modifier.weight(1f))
-                LuciferTile("MODS", R.drawable.aerix_ic_extension_outlined, {
-                    AerixDownloadRequest.open(AssetType.MOD, navigate)
-                }, Modifier.weight(1f))
-                LuciferTile("SHADERS", R.drawable.aerix_ic_lightbulb, {
-                    AerixDownloadRequest.open(AssetType.SHADER_PACK, navigate)
-                }, Modifier.weight(1f))
-                LuciferTile("SKINS", R.drawable.aerix_ic_person_outlined, actions.accounts, Modifier.weight(1f))
-            }
+            LuciferStat("MINECRAFT", mcVersion ?: "-", selected?.versionId ?: "NO INSTANCE")
+            LuciferStat("LOADER", loader ?: "-", if (selected?.isAerixClient == true) "AERIX CLIENT" else "INSTANCE LOADER")
+            LuciferStat("PLAYER", playerName, account?.authType?.name ?: "NO ACCOUNT")
         }
 
         Column(
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+            modifier = Modifier.weight(1.1f).fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("WELCOME BACK", color = Color.White.copy(alpha = 0.65f), fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
             Text(
                 text = playerName.uppercase(),
                 color = Color.White,
-                fontSize = 26.sp,
-                letterSpacing = 3.sp,
+                fontSize = 28.sp,
+                letterSpacing = 4.sp,
                 fontWeight = FontWeight.ExtraBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -1111,6 +1083,90 @@ private fun LuciferHome(
                 )
             }
         }
+
+        Column(
+            modifier = Modifier.weight(0.9f).fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+        ) {
+            Column(
+                modifier = Modifier
+                    .size(132.dp)
+                    .luciferGlass(CircleShape, strong = true)
+                    .clickable(role = Role.Button, onClick = if (selected != null) actions.play else actions.create)
+                    .guideAnchor(AerixGuideState.PLAY),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.aerix_ic_play_arrow_filled),
+                    contentDescription = if (selected != null) "Launch" else "Create",
+                    tint = Color.White,
+                    modifier = Modifier.size(46.dp)
+                )
+                Text(
+                    text = if (selected != null) "LAUNCH" else "CREATE",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    letterSpacing = 5.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                LuciferChip(mcVersion ?: "-")
+                LuciferChip((loader ?: "-").uppercase())
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                LuciferRound("VERSIONS", R.drawable.aerix_ic_dashboard_filled, actions.library)
+                LuciferRound("MODS", R.drawable.aerix_ic_extension_outlined) {
+                    AerixDownloadRequest.open(AssetType.MOD, navigate)
+                }
+                LuciferRound("SKINS", R.drawable.aerix_ic_person_outlined, actions.accounts)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LuciferStat(label: String, value: String, sub: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .luciferGlass(RoundedCornerShape(22.dp))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(label, color = Color.White.copy(alpha = 0.6f), fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
+        Text(value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(sub.uppercase(), color = Color.White.copy(alpha = 0.5f), fontSize = 8.sp, letterSpacing = 1.4.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun LuciferChip(text: String) {
+    Box(
+        modifier = Modifier
+            .luciferGlass(RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp, vertical = 5.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text, color = Color.White, fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+    }
+}
+
+@Composable
+private fun LuciferRound(label: String, iconRes: Int, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .luciferGlass(CircleShape)
+                .clickable(role = Role.Button, onClick = onClick),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(painter = painterResource(iconRes), contentDescription = label, tint = Color.White, modifier = Modifier.size(20.dp))
+        }
+        Text(label, color = Color.White.copy(alpha = 0.6f), fontSize = 8.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.SemiBold)
     }
 }
 

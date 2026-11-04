@@ -26,6 +26,14 @@
 
 package net.kdt.pojavlaunch.aerix.ui.screens
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
+import net.kdt.pojavlaunch.aerix.components.LuciferGlassButton
+import net.kdt.pojavlaunch.aerix.components.luciferGlass
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -288,8 +296,7 @@ fun AccountsScreen(activity: FragmentActivity) {
             .fillMaxSize()
             .padding(all = 12.dp),
         shape = RoundedCornerShape(22.dp),
-        color = AerixSurface.panel,
-        border = BorderStroke(AerixSpacing.hairline, AerixSurface.borderSoft)
+        color = Color.Transparent
     ) {
         Column(
             modifier = Modifier
@@ -298,29 +305,105 @@ fun AccountsScreen(activity: FragmentActivity) {
                 .padding(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // 1. Top row of pill buttons: + Microsoft, + Offline, + Auth Server, and + Equip Cape (from internal storage)
-            FlowRow(
+            val shown = current ?: accounts.firstOrNull()
+            if (accounts.size > 1) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                ) {
+                    accounts.forEach { entry ->
+                        LuciferTag(
+                            text = entry.username.uppercase(),
+                            strong = entry == current,
+                            onClick = { PojavAccountBridge.select(entry) }
+                        )
+                    }
+                }
+            }
+            if (shown == null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .luciferGlass(RoundedCornerShape(26.dp))
+                        .padding(vertical = 28.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.aerix_accounts_empty),
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 14.sp
+                    )
+                }
+            } else {
+                LuciferIdCard(account = shown, isCurrent = shown == current)
+            }
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
-                MiraiTopAccountPill(
-                    text = "Microsoft",
-                    onClick = { AerixNav.navigate(LauncherSection.ADD_ACCOUNT) }
+                LuciferGlassButton(
+                    text = "Change skin",
+                    height = 38.dp,
+                    cornerRadius = 19.dp,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.2.sp,
+                    onClick = {
+                        if (shown == null) {
+                            Toast.makeText(activity, "Add or select an account first", Toast.LENGTH_SHORT).show()
+                        } else {
+                            skinPickerAccount = shown
+                            runCatching {
+                                skinFilePicker.launch(arrayOf("image/png", "image/*"))
+                            }.onFailure {
+                                Toast.makeText(activity, "Unable to open file picker", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 )
-                MiraiTopAccountPill(
-                    text = "Offline",
+                LuciferGlassButton(
+                    text = "Wardrobe",
+                    height = 38.dp,
+                    cornerRadius = 19.dp,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.2.sp,
+                    onClick = { if (shown != null) PojavAccountBridge.openDetail(shown) }
+                )
+                LuciferGlassButton(
+                    text = "Add local",
+                    iconRes = R.drawable.aerix_ic_add,
+                    height = 38.dp,
+                    cornerRadius = 19.dp,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.2.sp,
+                    strong = true,
                     onClick = { showOfflineDialog = true }
                 )
-                MiraiTopAccountPill(
-                    text = "Auth Server",
+                LuciferGlassButton(
+                    text = "Microsoft",
+                    height = 38.dp,
+                    cornerRadius = 19.dp,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.2.sp,
                     onClick = { AerixNav.navigate(LauncherSection.ADD_ACCOUNT) }
                 )
-                MiraiTopAccountPill(
-                    text = "Equip Cape",
-                    highlighted = true,
+                LuciferGlassButton(
+                    text = "Auth server",
+                    height = 38.dp,
+                    cornerRadius = 19.dp,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.2.sp,
+                    onClick = { AerixNav.navigate(LauncherSection.ADD_ACCOUNT) }
+                )
+                LuciferGlassButton(
+                    text = "Equip cape",
+                    height = 38.dp,
+                    cornerRadius = 19.dp,
+                    fontSize = 11.sp,
+                    letterSpacing = 1.2.sp,
                     onClick = {
                         val target = current ?: accounts.firstOrNull()
                         if (target == null) {
@@ -334,67 +417,27 @@ fun AccountsScreen(activity: FragmentActivity) {
                         }
                     }
                 )
-            }
-
-            // 2. Accounts list (Mirai AccountItem cards — Photo 6)
-            if (accounts.isEmpty()) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    color = AerixSurface.panelRaised.copy(alpha = 0.35f),
-                    border = BorderStroke(AerixSpacing.hairline, AerixSurface.borderSoft)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.aerix_accounts_empty),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = AerixSurface.textSecondary
-                        )
-                    }
-                }
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    accounts.forEach { account ->
-                        val isCurrent = account == current
-                        MiraiAccountItemRow(
-                            account = account,
-                            isCurrent = isCurrent,
-                            onSelect = { PojavAccountBridge.select(account) },
-                            onOpenWardrobe = { PojavAccountBridge.openDetail(account) },
-                            onChangeSkin = {
-                                skinPickerAccount = account
-                                runCatching {
-                                    skinFilePicker.launch(arrayOf("image/png", "image/*"))
-                                }.onFailure {
-                                    Toast.makeText(activity, "Unable to open file picker", Toast.LENGTH_SHORT).show()
-                                }
-                            },
-                            onRefresh = {
-                                if (account.authType.requiresLogin()) {
-                                    PojavAccountBridge.forceRefresh(account)
-                                } else {
-                                    PojavAccountBridge.reload()
-                                    Toast.makeText(activity, "Refreshed ${account.username}", Toast.LENGTH_SHORT).show()
-                                }
-                            },
-                            onCopyUuid = {
-                                val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-                                clipboard?.setPrimaryClip(ClipData.newPlainText("Minecraft UUID", account.displayUuid))
-                                Toast.makeText(activity, "Copied UUID: ${account.displayUuid}", Toast.LENGTH_SHORT).show()
-                            },
-                            onDelete = { pendingDelete = account }
-                        )
-                    }
+                if (shown != null) {
+                    LuciferGlassButton(
+                        text = "Copy UUID",
+                        height = 38.dp,
+                        cornerRadius = 19.dp,
+                        fontSize = 11.sp,
+                        letterSpacing = 1.2.sp,
+                        onClick = {
+                            val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                            clipboard?.setPrimaryClip(ClipData.newPlainText("Minecraft UUID", shown.displayUuid))
+                            Toast.makeText(activity, "Copied UUID: ${shown.displayUuid}", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                    LuciferGlassButton(
+                        text = "Remove",
+                        height = 38.dp,
+                        cornerRadius = 19.dp,
+                        fontSize = 11.sp,
+                        letterSpacing = 1.2.sp,
+                        onClick = { pendingDelete = shown }
+                    )
                 }
             }
 
@@ -1925,4 +1968,129 @@ private fun CardTextAction(text: String, color: Color, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(horizontal = AerixSpacing.smPlus, vertical = AerixSpacing.xs)
     )
+}
+
+@Composable
+private fun LuciferTag(text: String, strong: Boolean = false, onClick: (() -> Unit)? = null) {
+    val shape = RoundedCornerShape(12.dp)
+    Box(
+        modifier = Modifier
+            .luciferGlass(shape, strong = strong)
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
+            .padding(horizontal = 14.dp, vertical = 7.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 11.sp,
+            letterSpacing = 1.6.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
+    }
+}
+
+@Composable
+private fun LuciferIdCard(account: AerixAccount, isCurrent: Boolean) {
+    val shape = RoundedCornerShape(28.dp)
+    val uuid = account.displayUuid.uppercase()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .luciferGlass(shape)
+            .drawBehind {
+                val center = Offset(size.width * 0.88f, size.height * 0.28f)
+                for (i in 1..7) {
+                    drawCircle(
+                        color = Color.White.copy(alpha = 0.13f),
+                        radius = i * size.height * 0.085f,
+                        center = center,
+                        style = Stroke(width = 1.dp.toPx())
+                    )
+                }
+            }
+            .padding(horizontal = 22.dp, vertical = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            AerixImageWell(
+                image = account.face,
+                fallback = R.drawable.aerix_head_steve,
+                size = 92.dp,
+                radius = 18.dp
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "LUCIFER LAUNCHER \u00B7 PLAYER ID",
+                    color = Color.White.copy(alpha = 0.55f),
+                    fontSize = 10.sp,
+                    letterSpacing = 2.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = account.username.uppercase(),
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 2.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LuciferTag(authTypeDisplayLabel(account.authType).uppercase())
+                    if (isCurrent) LuciferTag("ACTIVE", strong = true)
+                    if (account.expired) LuciferTag("EXPIRED")
+                }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "UUID",
+                    color = Color.White.copy(alpha = 0.5f),
+                    fontSize = 9.sp,
+                    letterSpacing = 1.6.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = uuid,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    letterSpacing = 1.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Canvas(
+                modifier = Modifier
+                    .width(170.dp)
+                    .height(30.dp)
+            ) {
+                val seed = uuid.hashCode()
+                var x = 0f
+                var i = 0
+                while (x < size.width) {
+                    val w = ((((seed shr (i % 24)) and 3) + 1) * 1.3f).dp.toPx()
+                    if (i % 2 == 0) {
+                        drawRect(
+                            color = Color.White.copy(alpha = 0.85f),
+                            topLeft = Offset(x, 0f),
+                            size = Size(minOf(w, size.width - x), size.height)
+                        )
+                    }
+                    x += w
+                    i++
+                }
+            }
+        }
+    }
 }

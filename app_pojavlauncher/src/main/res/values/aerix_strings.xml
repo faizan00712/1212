@@ -445,6 +445,7 @@
     <string name="aerix_create_import_modpack">Import modpack</string>
     <string name="aerix_create_import_modpack_sub">Modrinth / CurseForge / .mrpack</string>
     <string name="aerix_create_install">Create &amp; Install Instance</string>
+    <string name="aerix_create_install_short">Install</string>
     <string name="aerix_create_installing">Creating the instance</string>
     <string name="aerix_create_done">"%1$s" created</string>
     <string name="aerix_create_failed">The instance could not be created</string>

@@ -30,6 +30,7 @@ import net.kdt.pojavlaunch.aerix.bridge.AerixPreferences
 
 object AerixNav {
     /** Settings tab ids (mirai NormalNavKey.Settings.*). */
+    const val TAB_CENTER = "center"
     const val TAB_RENDERER = "renderer"
     const val TAB_GAME = "game"
     const val TAB_JAVA = "java"
@@ -56,7 +57,7 @@ object AerixNav {
         private set
 
     /** Last Settings tab other than Wallpapers, restored when the Settings rail entry is pressed. */
-    var settingsTab by mutableStateOf(TAB_RENDERER)
+    var settingsTab by mutableStateOf(TAB_CENTER)
 
     private val stack = ArrayList<LauncherSection>()
     private var initialized = false

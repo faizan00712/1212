@@ -170,6 +170,7 @@ private data class SettingTabItem(
 )
 
 private val settingTabItems = listOf(
+    SettingTabItem(AerixNav.TAB_CENTER, R.drawable.aerix_ic_dashboard_outlined, "Center"),
     SettingTabItem(AerixNav.TAB_RENDERER, R.drawable.aerix_ic_video_settings, "Renderer"),
     SettingTabItem(AerixNav.TAB_GAME, R.drawable.aerix_ic_rocket_launch_filled, "Game"),
     SettingTabItem(AerixNav.TAB_JAVA, R.drawable.aerix_ic_java, "Java"),
@@ -260,7 +261,7 @@ private fun BrandedRendererLogo(@DrawableRes logoRes: Int) {
 
 @Composable
 fun SettingsScreen(activity: FragmentActivity, tabKey: String, onTabChanged: (String) -> Unit) {
-    val activeKey = if (settingTabItems.any { it.key == tabKey }) tabKey else AerixNav.TAB_RENDERER
+    val activeKey = if (settingTabItems.any { it.key == tabKey }) tabKey else AerixNav.TAB_CENTER
 
     Column(
         modifier = Modifier
@@ -300,6 +301,7 @@ fun SettingsScreen(activity: FragmentActivity, tabKey: String, onTabChanged: (St
                 .weight(1f)
         ) {
             when (activeKey) {
+                AerixNav.TAB_CENTER -> LuciferControlCenter(activity, onTabChanged)
                 AerixNav.TAB_RENDERER -> RendererTabContent(activity)
                 AerixNav.TAB_GAME -> GameTabContent(activity)
                 AerixNav.TAB_JAVA -> JavaManageTabContent(activity)

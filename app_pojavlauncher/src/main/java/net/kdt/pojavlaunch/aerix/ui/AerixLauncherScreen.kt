@@ -112,7 +112,7 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
                 AerixNav.navigate(LauncherSection.SETTINGS)
             }
             LauncherSection.SETTINGS -> {
-                if (AerixNav.settingsTab == AerixNav.TAB_WALLPAPERS) AerixNav.settingsTab = AerixNav.TAB_RENDERER
+                AerixNav.settingsTab = AerixNav.TAB_CENTER
                 AerixNav.navigate(LauncherSection.SETTINGS)
             }
             LauncherSection.ABOUT -> {

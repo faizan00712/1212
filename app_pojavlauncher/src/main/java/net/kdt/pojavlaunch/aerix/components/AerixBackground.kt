@@ -168,7 +168,7 @@ fun AerixBackground(modifier: Modifier = Modifier, content: @Composable BoxScope
                         }
                     )
             )
-            if (id == AerixThemeManager.WALLPAPER_NONE) LuciferDots()
+            if (id == AerixThemeManager.WALLPAPER_NONE && AerixPreferences.backgroundDots) LuciferDots()
         }
         content()
     }

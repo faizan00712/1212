@@ -55,6 +55,7 @@ object AerixPreferences {
     const val KEY_FESTIVAL_EFFECTS = "launcherFestivalEffects"
     /** Accent pulses and glows. Read as Compose state, so the switch applies without a restart. */
     const val KEY_THEME_MOTION = "launcherThemeMotion"
+    const val KEY_BACKGROUND_DOTS = "launcherBackgroundDots"
     /** True once the first-run guide has been completed or skipped. */
     const val KEY_GUIDE_PLAYED = "launcherGuidePlayed"
     /** True once the first-run Notification ON/OFF popup window has been answered. */
@@ -118,6 +119,9 @@ object AerixPreferences {
 
     /** Aerix "launcherFestivalEffects": persistent festival particle layer. */
     var festivalEffects by mutableStateOf(false)
+        private set
+
+    var backgroundDots by mutableStateOf(true)
         private set
 
     /**
@@ -206,6 +210,7 @@ object AerixPreferences {
         animateExtent = p.getInt(KEY_ANIMATE_EXTENT, 3).coerceIn(0, 10)
         festivalEffects = p.getBoolean(KEY_FESTIVAL_EFFECTS, false)
         themeMotion = p.getBoolean(KEY_THEME_MOTION, true)
+        backgroundDots = p.getBoolean(KEY_BACKGROUND_DOTS, true)
         guidePlayed = p.getBoolean(KEY_GUIDE_PLAYED, false)
         notificationPromptShown = p.getBoolean(KEY_NOTIFICATION_PROMPT_SHOWN, false)
         loadingWallpaper = p.getBoolean(KEY_LOADING_WALLPAPER, false)
@@ -320,6 +325,11 @@ object AerixPreferences {
     fun saveAnimateExtent(value: Int) {
         animateExtent = value.coerceIn(0, 10)
         edit { putInt(KEY_ANIMATE_EXTENT, animateExtent) }
+    }
+
+    fun saveBackgroundDots(value: Boolean) {
+        backgroundDots = value
+        edit { putBoolean(KEY_BACKGROUND_DOTS, value) }
     }
 
     fun saveThemeMotion(value: Boolean) {

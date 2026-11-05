@@ -108,7 +108,7 @@ object AerixDiscordPresence {
     var status by mutableStateOf("STARTING")
         private set
 
-    private fun setStatus(value: String) {
+    private fun publishStatus(value: String) {
         main.post { status = value }
     }
     private var service: IDiscordRpcService? = null
@@ -188,7 +188,7 @@ object AerixDiscordPresence {
                 }
                 if (initialId == null || initialId <= 0L) {
                     Log.i(TAG, "No Discord application id set; presence stays off")
-                    setStatus("NO APP ID")
+                    publishStatus("NO APP ID")
                     clearOnlyMode = false
                     pendingClearAppId = 0L
                     staleAppIdToClearFirst = 0L
@@ -277,7 +277,7 @@ object AerixDiscordPresence {
                 }
             } else if (frame.contains("\"ERROR\"")) {
                 Log.w(TAG, "Discord RPC error frame: $frame")
-                setStatus("RPC ERROR")
+                publishStatus("RPC ERROR")
                 if (!clearOnlyMode && supportsExtendedFields) {
                     supportsExtendedFields = false
                     main.post { sendActivity() }
@@ -357,7 +357,7 @@ object AerixDiscordPresence {
             return
         }
         Log.w(TAG, "Discord refused RPC connection for id $id")
-        setStatus("REFUSED")
+        publishStatus("REFUSED")
         if (staleAppIdToClearFirst == id) {
             staleAppIdToClearFirst = 0L
             val next = resolveDesiredAppId()
@@ -741,7 +741,7 @@ object AerixDiscordPresence {
 
         val intent = resolveService() ?: run {
             Log.i(TAG, "Discord is not installed on this device")
-            setStatus("APP NOT FOUND")
+            publishStatus("APP NOT FOUND")
             return
         }
         bound = runCatching {
@@ -749,9 +749,9 @@ object AerixDiscordPresence {
         }.getOrDefault(false)
         if (!bound) {
             Log.w(TAG, "Could not bind to Discord's RPC service")
-            setStatus("BIND FAILED")
+            publishStatus("BIND FAILED")
         } else {
-            setStatus("CONNECTING")
+            publishStatus("CONNECTING")
         }
     }
 

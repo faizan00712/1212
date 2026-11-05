@@ -46,6 +46,7 @@ import net.kdt.pojavlaunch.aerix.bridge.PojavInstanceBridge
 import net.kdt.pojavlaunch.aerix.bridge.PojavLaunchBridge
 import net.kdt.pojavlaunch.aerix.bridge.PojavSettingsBridge
 import net.kdt.pojavlaunch.aerix.components.LuciferGlassButton
+import net.kdt.pojavlaunch.aerix.discord.AerixDiscordPresence
 import net.kdt.pojavlaunch.aerix.components.luciferGlass
 import net.kdt.pojavlaunch.aerix.theme.AerixSurface
 import net.kdt.pojavlaunch.aerix.ui.AerixNav
@@ -155,6 +156,16 @@ fun LuciferControlCenter(activity: FragmentActivity, onOpenTab: (String) -> Unit
             InfoChip(selected?.name ?: "NO INSTANCE", Modifier.widthIn(max = 180.dp))
             InfoChip(javaLabel)
             InfoChip(ramLabel)
+            val discordOn = AerixPreferences.discordPresenceEnabled
+            InfoChip(
+                text = if (discordOn) "DISCORD ON" else "DISCORD OFF",
+                modifier = Modifier.clickable(role = Role.Switch) {
+                    val next = !discordOn
+                    AerixPreferences.saveDiscordPresenceEnabled(next)
+                    if (next) AerixDiscordPresence.syncSettingsChanged(activity.applicationContext)
+                    else AerixDiscordPresence.clearAndDetach(activity.applicationContext)
+                }
+            )
             Spacer(Modifier.weight(1f))
             LuciferGlassButton(
                 text = "LAUNCH",

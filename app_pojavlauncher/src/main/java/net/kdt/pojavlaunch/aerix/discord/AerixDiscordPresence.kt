@@ -30,6 +30,9 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.discord.socialsdk.rpc.IDiscordRpcCallback
 import com.discord.socialsdk.rpc.IDiscordRpcConnection
 import com.discord.socialsdk.rpc.IDiscordRpcService
@@ -100,6 +103,14 @@ object AerixDiscordPresence {
     private val main = Handler(Looper.getMainLooper())
 
     private var appContext: Context? = null
+
+    /** Short connection status for the settings chip: why the card is or is not showing. */
+    var status by mutableStateOf("STARTING")
+        private set
+
+    private fun setStatus(value: String) {
+        main.post { status = value }
+    }
     private var service: IDiscordRpcService? = null
     private var connection: IDiscordRpcConnection? = null
     private var connectedAppId: Long = 0L
@@ -177,6 +188,7 @@ object AerixDiscordPresence {
                 }
                 if (initialId == null || initialId <= 0L) {
                     Log.i(TAG, "No Discord application id set; presence stays off")
+                    setStatus("NO APP ID")
                     clearOnlyMode = false
                     pendingClearAppId = 0L
                     staleAppIdToClearFirst = 0L
@@ -206,6 +218,7 @@ object AerixDiscordPresence {
             if (frame.contains("\"READY\"")) {
                 main.post {
                     ready = true
+                    status = "CONNECTED"
                     if (staleAppIdToClearFirst > 0L && connectedAppId == staleAppIdToClearFirst && !clearOnlyMode) {
                         // Flush clear on the previous app ID before connecting the new app ID!
                         sendClearFrameImmediate()
@@ -264,6 +277,7 @@ object AerixDiscordPresence {
                 }
             } else if (frame.contains("\"ERROR\"")) {
                 Log.w(TAG, "Discord RPC error frame: $frame")
+                setStatus("RPC ERROR")
                 if (!clearOnlyMode && supportsExtendedFields) {
                     supportsExtendedFields = false
                     main.post { sendActivity() }
@@ -274,6 +288,7 @@ object AerixDiscordPresence {
         override fun onClose(code: Int, message: String?) {
             main.post {
                 val closedId = connectedAppId
+                status = "CLOSED $code"
                 ready = false
                 connection = null
                 connectedAppId = 0L
@@ -342,6 +357,7 @@ object AerixDiscordPresence {
             return
         }
         Log.w(TAG, "Discord refused RPC connection for id $id")
+        setStatus("REFUSED")
         if (staleAppIdToClearFirst == id) {
             staleAppIdToClearFirst = 0L
             val next = resolveDesiredAppId()
@@ -725,12 +741,18 @@ object AerixDiscordPresence {
 
         val intent = resolveService() ?: run {
             Log.i(TAG, "Discord is not installed on this device")
+            setStatus("APP NOT FOUND")
             return
         }
         bound = runCatching {
             appContext!!.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }.getOrDefault(false)
-        if (!bound) Log.w(TAG, "Could not bind to Discord's RPC service")
+        if (!bound) {
+            Log.w(TAG, "Could not bind to Discord's RPC service")
+            setStatus("BIND FAILED")
+        } else {
+            setStatus("CONNECTING")
+        }
     }
 
     /** Drop the connection immediately (internal helper; use [clearAndDetach] to clear profile first). */

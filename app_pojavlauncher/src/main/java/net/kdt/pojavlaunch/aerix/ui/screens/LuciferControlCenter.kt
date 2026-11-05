@@ -158,7 +158,7 @@ fun LuciferControlCenter(activity: FragmentActivity, onOpenTab: (String) -> Unit
             InfoChip(ramLabel)
             val discordOn = AerixPreferences.discordPresenceEnabled
             InfoChip(
-                text = if (discordOn) "DISCORD ON" else "DISCORD OFF",
+                text = if (discordOn) "DISCORD \u00B7 ${AerixDiscordPresence.status}" else "DISCORD OFF",
                 modifier = Modifier.clickable(role = Role.Switch) {
                     val next = !discordOn
                     AerixPreferences.saveDiscordPresenceEnabled(next)

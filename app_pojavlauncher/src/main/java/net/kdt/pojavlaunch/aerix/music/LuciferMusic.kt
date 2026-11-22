@@ -44,11 +44,13 @@ object LuciferMusicApi {
         } else {
             "$API/tracks/search?query=${URLEncoder.encode(query, "UTF-8")}&limit=60&app_name=$APP_NAME"
         }
-        val data = try {
-            JSONObject(DownloadUtils.downloadString(url)).optJSONArray("data")
+        val data: org.json.JSONArray?
+        try {
+            data = JSONObject(DownloadUtils.downloadString(url)).optJSONArray("data")
         } catch (e: org.json.JSONException) {
             throw IOException("Unreadable song list", e)
-        } ?: return emptyList()
+        }
+        if (data == null) return emptyList()
         val out = ArrayList<MusicTrack>()
         for (i in 0 until data.length()) {
             val t = data.optJSONObject(i) ?: continue

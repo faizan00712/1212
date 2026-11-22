@@ -150,6 +150,7 @@ private class HomeActions(
     val create: () -> Unit,
     val socials: () -> Unit,
     val explore: () -> Unit,
+    val music: () -> Unit,
     val library: () -> Unit,
     val files: () -> Unit,
     val controls: () -> Unit,
@@ -189,6 +190,7 @@ fun HomeScreen(activity: FragmentActivity, navigate: (LauncherSection) -> Unit) 
         create = { AerixNav.navigate(LauncherSection.CREATE_INSTANCE) },
         socials = { navigate(LauncherSection.SOCIALS) },
         explore = { navigate(LauncherSection.DISCOVER) },
+        music = { navigate(LauncherSection.MUSIC) },
         library = { navigate(LauncherSection.LIBRARY) },
         files = { PojavInstanceBridge.openGameDirectory(activity) },
         controls = { PojavNavigator.openCustomControls(activity) },
@@ -602,6 +604,7 @@ private fun QuickTiles(count: Int, accent: Color, actions: HomeActions, modifier
             // with the one thing the launcher can do that no other launcher can.
             Triple(R.drawable.aerix_ic_people, stringResource(R.string.aerix_home_quick_socials) to socialSubtitle, accent to actions.socials),
             Triple(R.drawable.aerix_ic_search, stringResource(R.string.aerix_home_quick_explore) to stringResource(R.string.aerix_home_quick_explore_sub), AerixSurface.glassBlue to actions.explore),
+            Triple(R.drawable.aerix_ic_music_note_filled, stringResource(R.string.aerix_home_quick_music) to stringResource(R.string.aerix_home_quick_music_sub), Color.White to actions.music),
             Triple(R.drawable.aerix_ic_dashboard_filled, stringResource(R.string.aerix_home_quick_library) to stringResource(R.string.aerix_home_quick_library_sub, count), AerixSurface.glassViolet to actions.library),
             Triple(R.drawable.aerix_ic_folder_outlined, stringResource(R.string.aerix_home_quick_files) to stringResource(R.string.aerix_home_quick_files_sub), AerixSurface.glassRose to actions.fileManager)
         )

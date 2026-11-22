@@ -89,6 +89,8 @@ enum class LauncherSection {
     /** Friends, messages and parties - the social launcher, opened from Home and the rail. */
     SOCIALS,
     DISCOVER,
+    /** The songs that ship with the launcher, played from the launcher itself. */
+    MUSIC,
     OTHER_RELEASES,
     DOWNLOADS,
     CONTENT,
@@ -196,6 +198,8 @@ fun AerixNavigationRail(
                 // sidebar, so it is not listed next to the launcher's own sections.
                 RailIconItem(R.drawable.aerix_ic_public, stringResource(R.string.aerix_nav_discover),
                     discoverSelected(selectedSection), activeAccent, expandedRail, compactRail) { onNavigate(LauncherSection.DISCOVER) }
+                RailIconItem(R.drawable.aerix_ic_music_note_filled, stringResource(R.string.aerix_nav_music),
+                    selectedSection == LauncherSection.MUSIC, activeAccent, expandedRail, compactRail) { onNavigate(LauncherSection.MUSIC) }
                 RailIconItem(R.drawable.aerix_ic_rocket_launch_filled, "Our other new releases",
                     selectedSection == LauncherSection.OTHER_RELEASES, activeAccent, expandedRail, compactRail) { onNavigate(LauncherSection.OTHER_RELEASES) }
                 RailIconItem(R.drawable.aerix_ic_format_paint_outlined, stringResource(R.string.aerix_nav_wallpapers),

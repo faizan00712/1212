@@ -41,6 +41,10 @@ data class MusicTrack(
     val seconds: Int,
     val bpm: Int,
     val file: String,
+    /** English words for the title, so a search finds it without the Hindi spelling. */
+    val keywords: String = "",
+    /** True for the eight songs written in the Indian raags, which the list shows first. */
+    val indian: Boolean = false,
     @RawRes val rawRes: Int,
     @DrawableRes val cover: Int,
     val accent: Color

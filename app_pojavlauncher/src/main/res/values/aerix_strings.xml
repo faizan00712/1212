@@ -106,7 +106,7 @@
     <string name="aerix_home_quick_files">File space</string>
     <string name="aerix_home_quick_files_sub">Open game directory</string>
     <string name="aerix_home_quick_music">Music</string>
-    <string name="aerix_home_quick_music_sub">Songs built in · play offline</string>
+    <string name="aerix_home_quick_music_sub">%1$d songs · Indian &amp; Minecraft</string>
     <string name="aerix_home_ready_sub">Your next chapter is only one touch away.</string>
     <string name="aerix_home_empty_sub">Build a world, choose your style, and make it yours.</string>
     <string name="aerix_home_active_sub">Your selected game instance</string>

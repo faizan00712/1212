@@ -1,7 +1,9 @@
 /*
  * Aerix Launcher UI layer for PojavLauncher.
- * The Music section's catalogue: twelve original instrumentals rendered for this launcher and
- * shipped inside the APK, so the section works with no connection and nothing to fetch.
+ * The Music section's catalogue: twenty original instrumentals rendered for this launcher and
+ * shipped inside the APK, so the section works with no connection and nothing to fetch. Eight of
+ * them are written in the raags and rhythms Indian film music uses; the other twelve are the
+ * Minecraft-flavoured set.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +53,8 @@ data class MusicTrack(
         val needle = query.trim()
         if (needle.isEmpty()) return true
         return title.contains(needle, ignoreCase = true) ||
-            subtitle.contains(needle, ignoreCase = true)
+            subtitle.contains(needle, ignoreCase = true) ||
+            keywords.contains(needle, ignoreCase = true)
     }
 }
 
@@ -69,6 +72,115 @@ object AerixMusic {
      * player a real MP3 rather than a link that might stop working later.
      */
     val tracks: List<MusicTrack> = listOf(
+        // ---- Indian set -------------------------------------------------------------------
+        // Eight originals in the raags and rhythms Indian film songs are built on. The words in
+        // the subtitle line are there so a search finds them in Hindi or in English.
+        MusicTrack(
+            id = "chandni_raat",
+            title = "Chandni Raat",
+            subtitle = "चाँदनी रात · Moonlit night · Raag Yaman · 76 BPM",
+            seconds = 59,
+            bpm = 76,
+            file = "Chandni Raat.mp3",
+            keywords = "moonlight moonlit night raat chandni romantic evening",
+            indian = true,
+            rawRes = R.raw.aerix_song_chandni_raat,
+            cover = R.drawable.aerix_cover_chandni_raat,
+            accent = Color(0xFFBFD4E8)
+        ),
+        MusicTrack(
+            id = "monsoon_aangan",
+            title = "Monsoon Aangan",
+            subtitle = "मानसून आँगन · First rain · Raag Pahadi · 84 BPM",
+            seconds = 54,
+            bpm = 84,
+            file = "Monsoon Aangan.mp3",
+            keywords = "rain monsoon barish barsaat saawan courtyard romantic",
+            indian = true,
+            rawRes = R.raw.aerix_song_monsoon_aangan,
+            cover = R.drawable.aerix_cover_monsoon_aangan,
+            accent = Color(0xFF8FC4B0)
+        ),
+        MusicTrack(
+            id = "desi_dhoon",
+            title = "Desi Dhoon",
+            subtitle = "देसी धुन · Festival tune · Raag Khamaj · 102 BPM",
+            seconds = 43,
+            bpm = 102,
+            file = "Desi Dhoon.mp3",
+            keywords = "desi festival tune folk dhol wedding celebration",
+            indian = true,
+            rawRes = R.raw.aerix_song_desi_dhoon,
+            cover = R.drawable.aerix_cover_desi_dhoon,
+            accent = Color(0xFFF2B25E)
+        ),
+        MusicTrack(
+            id = "ghungroo",
+            title = "Ghungroo",
+            subtitle = "घुंघरू · Dance beat · Raag Bhairavi · 112 BPM",
+            seconds = 39,
+            bpm = 112,
+            file = "Ghungroo.mp3",
+            keywords = "dance ghungroo anklet bells navratri garba beat",
+            indian = true,
+            rawRes = R.raw.aerix_song_ghungroo,
+            cover = R.drawable.aerix_cover_ghungroo,
+            accent = Color(0xFFE06A5C)
+        ),
+        MusicTrack(
+            id = "bansuri_ki_dhun",
+            title = "Bansuri Ki Dhun",
+            subtitle = "बाँसुरी की धुन · Flute theme · Raag Desh · 66 BPM",
+            seconds = 68,
+            bpm = 66,
+            file = "Bansuri Ki Dhun.mp3",
+            keywords = "flute bansuri instrumental peaceful theme",
+            indian = true,
+            rawRes = R.raw.aerix_song_bansuri_ki_dhun,
+            cover = R.drawable.aerix_cover_bansuri_ki_dhun,
+            accent = Color(0xFFA8C0B8)
+        ),
+        MusicTrack(
+            id = "shaadi_baraat",
+            title = "Shaadi Baraat",
+            subtitle = "शादी बारात · Wedding march · Raag Khamaj · 118 BPM",
+            seconds = 37,
+            bpm = 118,
+            file = "Shaadi Baraat.mp3",
+            keywords = "wedding shaadi baraat marriage march celebration",
+            indian = true,
+            rawRes = R.raw.aerix_song_shaadi_baraat,
+            cover = R.drawable.aerix_cover_shaadi_baraat,
+            accent = Color(0xFFF0707A)
+        ),
+        MusicTrack(
+            id = "yaadon_ki_shaam",
+            title = "Yaadon Ki Shaam",
+            subtitle = "यादों की शाम · Evening of memories · Raag Bhairavi · 72 BPM",
+            seconds = 63,
+            bpm = 72,
+            file = "Yaadon Ki Shaam.mp3",
+            keywords = "memories yaad nostalgia sad evening old song",
+            indian = true,
+            rawRes = R.raw.aerix_song_yaadon_ki_shaam,
+            cover = R.drawable.aerix_cover_yaadon_ki_shaam,
+            accent = Color(0xFFD9A17C)
+        ),
+        MusicTrack(
+            id = "rajasthan_route",
+            title = "Rajasthan Route",
+            subtitle = "राजस्थान · Desert road · Raag Kirwani · 126 BPM",
+            seconds = 35,
+            bpm = 126,
+            file = "Rajasthan Route.mp3",
+            keywords = "rajasthan desert road travel folk dholak energetic",
+            indian = true,
+            rawRes = R.raw.aerix_song_rajasthan_route,
+            cover = R.drawable.aerix_cover_rajasthan_route,
+            accent = Color(0xFFE8A05C)
+        ),
+
+        // ---- Minecraft set ---------------------------------------------------------------
         MusicTrack(
             id = "dawn_over_the_valley",
             title = "Dawn Over The Valley",
@@ -205,7 +317,7 @@ object AerixMusic {
 
     fun byId(id: String?): MusicTrack? = if (id == null) null else tracks.firstOrNull { it.id == id }
 
-    /** Total running time of the section, e.g. "17 min". */
+    /** Total running time of the section, in whole minutes. */
     val totalMinutes: Int get() = (tracks.sumOf { it.seconds } + 30) / 60
 
     fun search(query: String): List<MusicTrack> =

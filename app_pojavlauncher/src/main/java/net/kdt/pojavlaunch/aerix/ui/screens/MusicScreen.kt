@@ -104,24 +104,44 @@ fun MusicScreen(modifier: Modifier = Modifier) {
     val accent = AerixThemeManager.currentAccent()
     var query by remember { mutableStateOf("") }
     var savedTick by remember { mutableStateOf(0) }
+    // "all", "indian" or "minecraft". The list remembers it while the launcher is open.
+    var collection by remember { mutableStateOf(MusicFilter.ALL) }
 
     val playingTrack = AerixMusicPlayer.current
     val playing = AerixMusicPlayer.playing
     val savedRevision = AerixMusicPlayer.savedRevision
     // Which tracks already have a file on the phone. Recomputed only when a download finishes,
-    // because the check is a disk call and there are twelve of them.
+    // because the check is a disk call and there is one per song.
     val savedIds = remember(savedRevision, savedTick) {
         AerixMusic.tracks.filter { MusicDownloads.isSaved(context, it) }.map { it.id }.toSet()
     }
-    val results = remember(query) { AerixMusic.search(query) }
+    val results = remember(query, collection) {
+        AerixMusic.search(query).filter { track ->
+            when (collection) {
+                MusicFilter.INDIAN -> track.indian
+                MusicFilter.MINECRAFT -> !track.indian
+                else -> true
+            }
+        }
+    }
+    val indianCount = remember { AerixMusic.tracks.count { it.indian } }
+    val minecraftCount = remember { AerixMusic.tracks.size - indianCount }
 
     Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(AerixSpacing.smPlus)) {
         MusicHeader(playingTrack = playingTrack)
         MusicSearchField(
             query = query,
             onQueryChange = { query = it },
-            hint = "Search songs by name…",
+            hint = "Search songs by name, in Hindi or English…",
+            resultLine = "Showing ${results.size} of ${AerixMusic.tracks.size} songs",
             modifier = Modifier.fillMaxWidth()
+        )
+        MusicFilterRow(
+            selected = collection,
+            allCount = AerixMusic.tracks.size,
+            indianCount = indianCount,
+            minecraftCount = minecraftCount,
+            onSelect = { collection = it }
         )
 
         val failure = MusicDownloads.failure
@@ -230,6 +250,7 @@ fun MusicScreen(modifier: Modifier = Modifier) {
                     MusicSidePanel(
                         accent = accent,
                         trackCount = AerixMusic.tracks.size,
+                        indianCount = indianCount,
                         savedCount = savedIds.size,
                         playingTitle = playingTrack?.title,
                         repeatAll = AerixMusicPlayer.repeatAll,
@@ -282,8 +303,8 @@ private fun MusicHeader(playingTrack: MusicTrack?) {
                     fontWeight = FontWeight.Black
                 )
                 Text(
-                    text = if (playingTrack != null) "Now playing: ${playingTrack.title}"
-                    else "${AerixMusic.tracks.size} songs · ${AerixMusic.totalMinutes} min · playable offline",
+                    text = "${AerixMusic.tracks.size} songs · ${AerixMusic.totalMinutes} min · " +
+                        if (playingTrack != null) "now playing ${playingTrack.title}" else "playable offline",
                     color = AerixSurface.textSecondary,
                     fontSize = 11.sp,
                     maxLines = 1,
@@ -300,55 +321,120 @@ private fun MusicSearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     hint: String,
+    resultLine: String,
     modifier: Modifier = Modifier
 ) {
     val accent = AerixThemeManager.currentAccent()
-    Row(
-        modifier = modifier
-            .height(40.dp)
-            .clip(RoundedCornerShape(AerixRadii.control))
-            .background(AerixSurface.panelRaised)
-            .border(AerixSpacing.hairline, AerixSurface.borderSoft, RoundedCornerShape(AerixRadii.control))
-            .padding(horizontal = AerixSpacing.smPlus),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AerixSpacing.smCompact)
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.aerix_ic_search),
-            contentDescription = null,
-            tint = AerixSurface.textSecondary,
-            modifier = Modifier.size(16.dp)
-        )
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-            if (query.isEmpty()) {
-                Text(
-                    text = hint,
-                    color = AerixSurface.textMuted,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AerixSpacing.xxs)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .clip(RoundedCornerShape(AerixRadii.control))
+                .background(AerixSurface.panelRaised)
+                .border(AerixSpacing.hairline, AerixSurface.borderSoft, RoundedCornerShape(AerixRadii.control))
+                .padding(horizontal = AerixSpacing.smPlus),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AerixSpacing.smCompact)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.aerix_ic_search),
+                contentDescription = null,
+                tint = AerixSurface.textSecondary,
+                modifier = Modifier.size(16.dp)
+            )
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                if (query.isEmpty()) {
+                    Text(
+                        text = hint,
+                        color = AerixSurface.textMuted,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                BasicTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    singleLine = true,
+                    textStyle = TextStyle(color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium),
+                    cursorBrush = SolidColor(accent),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = {}),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
-            BasicTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                singleLine = true,
-                textStyle = TextStyle(color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium),
-                cursorBrush = SolidColor(accent),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {}),
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (query.isNotEmpty()) {
+                Icon(
+                    painter = painterResource(R.drawable.aerix_ic_close),
+                    contentDescription = "Clear search",
+                    tint = AerixSurface.textSecondary,
+                    modifier = Modifier
+                        .size(15.dp)
+                        .clickable { onQueryChange("") }
+                )
+            }
         }
-        if (query.isNotEmpty()) {
-            Icon(
-                painter = painterResource(R.drawable.aerix_ic_close),
-                contentDescription = "Clear search",
-                tint = AerixSurface.textSecondary,
+        Text(
+            text = resultLine,
+            color = AerixSurface.textMuted,
+            fontSize = 10.sp,
+            modifier = Modifier.padding(start = AerixSpacing.xs)
+        )
+    }
+}
+
+/** Which half of the list is showing. */
+private enum class MusicFilter { ALL, INDIAN, MINECRAFT }
+
+/** The three small pills above the list: everything, the Indian set, the Minecraft set. */
+@Composable
+private fun MusicFilterRow(
+    selected: MusicFilter,
+    allCount: Int,
+    indianCount: Int,
+    minecraftCount: Int,
+    onSelect: (MusicFilter) -> Unit
+) {
+    val accent = AerixThemeManager.currentAccent()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(AerixSpacing.smCompact)
+    ) {
+        val pills = listOf(
+            Triple(MusicFilter.ALL, "All songs", allCount),
+            Triple(MusicFilter.INDIAN, "Indian", indianCount),
+            Triple(MusicFilter.MINECRAFT, "Minecraft", minecraftCount)
+        )
+        pills.forEach { (filter, label, count) ->
+            val on = selected == filter
+            Row(
                 modifier = Modifier
-                    .size(15.dp)
-                    .clickable { onQueryChange("") }
-            )
+                    .clip(CircleShape)
+                    .background(if (on) accent.copy(alpha = 0.18f) else AerixSurface.panelRaised)
+                    .border(
+                        AerixSpacing.hairline,
+                        if (on) accent else AerixSurface.borderSoft,
+                        CircleShape
+                    )
+                    .clickable(role = Role.Tab) { onSelect(filter) }
+                    .padding(horizontal = AerixSpacing.md, vertical = AerixSpacing.smCompact),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AerixSpacing.xxs)
+            ) {
+                Text(
+                    text = label,
+                    color = if (on) Color.White else AerixSurface.textSecondary,
+                    fontSize = 11.sp,
+                    fontWeight = if (on) FontWeight.Bold else FontWeight.Medium
+                )
+                Text(
+                    text = "$count",
+                    color = if (on) accent else AerixSurface.textMuted,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
@@ -706,6 +792,7 @@ private fun NowPlayingBar(
 private fun MusicSidePanel(
     accent: Color,
     trackCount: Int,
+    indianCount: Int,
     savedCount: Int,
     playingTitle: String?,
     repeatAll: Boolean,
@@ -732,6 +819,7 @@ private fun MusicSidePanel(
                 fontWeight = FontWeight.ExtraBold
             )
             StatLine("Songs", "$trackCount")
+            StatLine("Indian set", "$indianCount")
             StatLine("Saved on this phone", "$savedCount")
             StatLine("Playing", playingTitle ?: "Nothing")
             Box(modifier = Modifier.height(1.dp).fillMaxWidth().background(AerixSurface.borderSoft))

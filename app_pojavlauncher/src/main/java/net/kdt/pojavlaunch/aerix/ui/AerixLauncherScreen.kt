@@ -199,6 +199,7 @@ fun AerixLauncherScreen(activity: FragmentActivity) {
                             LauncherSection.SOCIALS -> SocialsScreen(activity) { AerixNav.finishTo(LauncherSection.HOME) }
                             LauncherSection.DISCOVER, LauncherSection.DOWNLOADS -> DiscoverScreen(activity, navigate)
                             LauncherSection.FILES -> FileManagerScreen(activity)
+                            LauncherSection.MUSIC -> net.kdt.pojavlaunch.aerix.ui.screens.MusicScreen(activity)
                             LauncherSection.LOGS -> LogScreen(activity)
                             LauncherSection.WALLPAPERS -> WallpapersScreen()
                             LauncherSection.SETTINGS -> SettingsScreen(

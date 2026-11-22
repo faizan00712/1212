@@ -32,6 +32,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>                         
@@ -190,6 +192,11 @@
             android:name="net.kdt.pojavlaunch.mobileglues.MgQueryService"
             android:exported="false"
             android:process=":mgquery" />
+
+        <service android:name="net.kdt.pojavlaunch.aerix.music.MusicService"
+            android:exported="false"
+            android:stopWithTask="true"
+            android:foregroundServiceType="mediaPlayback" />
 
         <service android:name="net.kdt.pojavlaunch.services.ProgressService"
             android:stopWithTask="true"

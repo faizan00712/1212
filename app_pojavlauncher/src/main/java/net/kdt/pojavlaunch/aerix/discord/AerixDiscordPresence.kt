@@ -1133,6 +1133,7 @@ object AerixDiscordPresence {
         const val ABOUT = "Reading about the launcher"
         const val SOCIALS = "Chatting in Socials"
         const val AERIX_CLIENT = "Configuring Aerix Client 1.16.5"
+        const val MUSIC = "Listening to music"
         const val GENERIC = "Browsing"
 
         fun stateFor(section: String?): String = when (section?.uppercase()) {
@@ -1145,6 +1146,7 @@ object AerixDiscordPresence {
             "SETTINGS", "LOGS", "CONTRIBUTION", "CONTRIBUTION_DETAIL" -> SETTINGS
             "ACCOUNTS", "ADD_ACCOUNT", "OFFLINE_ACCOUNT" -> ACCOUNTS
             "FILES" -> FILES
+            "MUSIC" -> MUSIC
             "SOCIALS" -> SOCIALS
             "ABOUT", "OTHER_RELEASES" -> ABOUT
             else -> GENERIC

@@ -109,6 +109,9 @@ fun LuciferTopNav(
             TopNavItem(R.drawable.aerix_ic_folder_filled, "Files", selectedSection == LauncherSection.FILES) {
                 onNavigate(LauncherSection.FILES)
             }
+            TopNavItem(R.drawable.aerix_ic_music, "Music", selectedSection == LauncherSection.MUSIC) {
+                onNavigate(LauncherSection.MUSIC)
+            }
             TopNavItem(R.drawable.aerix_ic_rocket_launch_filled, "Releases", selectedSection == LauncherSection.OTHER_RELEASES) {
                 onNavigate(LauncherSection.OTHER_RELEASES)
             }

@@ -95,6 +95,8 @@ enum class LauncherSection {
     DOWNLOADS,
     CONTENT,
     FILES,
+    /** Songs: search, play, stop and download. */
+    MUSIC,
     WALLPAPERS,
     LOGS,
     SETTINGS,
@@ -198,6 +200,8 @@ fun AerixNavigationRail(
                 // sidebar, so it is not listed next to the launcher's own sections.
                 RailIconItem(R.drawable.aerix_ic_public, stringResource(R.string.aerix_nav_discover),
                     discoverSelected(selectedSection), activeAccent, expandedRail, compactRail) { onNavigate(LauncherSection.DISCOVER) }
+                RailIconItem(R.drawable.aerix_ic_music, "Music",
+                    selectedSection == LauncherSection.MUSIC, activeAccent, false, compactDock) { onNavigate(LauncherSection.MUSIC) }
                 RailIconItem(R.drawable.aerix_ic_rocket_launch_filled, "Our other new releases",
                     selectedSection == LauncherSection.OTHER_RELEASES, activeAccent, expandedRail, compactRail) { onNavigate(LauncherSection.OTHER_RELEASES) }
                 RailIconItem(R.drawable.aerix_ic_format_paint_outlined, stringResource(R.string.aerix_nav_wallpapers),
